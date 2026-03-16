@@ -35,6 +35,3 @@ artifacts/
 # OS
 .DS_Store
 Thumbs.db
-
-# launchSettings (contains machine-specific ports/profiles)
-Properties/launchSettings.json

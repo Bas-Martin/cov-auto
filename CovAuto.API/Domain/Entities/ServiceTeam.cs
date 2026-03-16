@@ -1,5 +1,3 @@
-using CovAuto.API.Domain.Enums;
-
 namespace CovAuto.API.Domain.Entities;
 
 public class ServiceTeam
