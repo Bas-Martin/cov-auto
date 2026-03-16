@@ -3,8 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using CovAuto.API.Application.DTOs;
 using CovAuto.API.Application.Interfaces;
-using CovAuto.API.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CovAuto.API.Application.Services;
@@ -14,21 +12,19 @@ namespace CovAuto.API.Application.Services;
 /// </summary>
 public class AuthService : IAuthService
 {
-    private readonly AppDbContext _context;
+    private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
 
-    public AuthService(AppDbContext context, IConfiguration configuration)
+    public AuthService(IUserRepository userRepository, IConfiguration configuration)
     {
-        _context = context;
+        _userRepository = userRepository;
         _configuration = configuration;
     }
 
     public async Task<LoginResponse?> LoginAsync(LoginRequest request)
     {
-        // Zoek de gebruiker op username
-        var user = await _context.Users
-            .Include(u => u.ServiceTeam)
-            .FirstOrDefaultAsync(u => u.Username == request.Username);
+        // Zoek de gebruiker op username via de repository
+        var user = await _userRepository.GetByUsernameAsync(request.Username);
 
         if (user == null)
             return null;

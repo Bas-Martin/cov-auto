@@ -2,6 +2,7 @@ using System.Text;
 using CovAuto.API.Application.Interfaces;
 using CovAuto.API.Application.Services;
 using CovAuto.API.Infrastructure.Data;
+using CovAuto.API.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -71,6 +72,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+// --- Dependency Injection: Repositories registreren ---
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IServiceTeamRepository, ServiceTeamRepository>();
+builder.Services.AddScoped<IWorkOrderRepository, WorkOrderRepository>();
 
 // --- Dependency Injection: Services registreren ---
 builder.Services.AddScoped<IAuthService, AuthService>();

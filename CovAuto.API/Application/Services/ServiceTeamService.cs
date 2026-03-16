@@ -1,7 +1,5 @@
 using CovAuto.API.Application.DTOs;
 using CovAuto.API.Application.Interfaces;
-using CovAuto.API.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace CovAuto.API.Application.Services;
 
@@ -10,28 +8,22 @@ namespace CovAuto.API.Application.Services;
 /// </summary>
 public class ServiceTeamService : IServiceTeamService
 {
-    private readonly AppDbContext _context;
+    private readonly IServiceTeamRepository _teamRepository;
 
-    public ServiceTeamService(AppDbContext context)
+    public ServiceTeamService(IServiceTeamRepository teamRepository)
     {
-        _context = context;
+        _teamRepository = teamRepository;
     }
 
     public async Task<IEnumerable<ServiceTeamDto>> GetAllTeamsAsync()
     {
-        var teams = await _context.ServiceTeams
-            .Include(t => t.Members)
-            .ToListAsync();
-
+        var teams = await _teamRepository.GetAllWithMembersAsync();
         return teams.Select(MapToDto);
     }
 
     public async Task<ServiceTeamDto?> GetTeamByIdAsync(int id)
     {
-        var team = await _context.ServiceTeams
-            .Include(t => t.Members)
-            .FirstOrDefaultAsync(t => t.Id == id);
-
+        var team = await _teamRepository.GetByIdWithMembersAsync(id);
         return team == null ? null : MapToDto(team);
     }
 

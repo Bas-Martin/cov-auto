@@ -2,8 +2,6 @@ using System.Diagnostics;
 using System.Text;
 using CovAuto.API.Application.DTOs;
 using CovAuto.API.Application.Interfaces;
-using CovAuto.API.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace CovAuto.API.Application.Services;
 
@@ -13,12 +11,17 @@ namespace CovAuto.API.Application.Services;
 /// </summary>
 public class ReportService : IReportService
 {
-    private readonly AppDbContext _context;
+    private readonly IServiceTeamRepository _teamRepository;
+    private readonly IWorkOrderRepository _workOrderRepository;
     private readonly ILogger<ReportService> _logger;
 
-    public ReportService(AppDbContext context, ILogger<ReportService> logger)
+    public ReportService(
+        IServiceTeamRepository teamRepository,
+        IWorkOrderRepository workOrderRepository,
+        ILogger<ReportService> logger)
     {
-        _context = context;
+        _teamRepository = teamRepository;
+        _workOrderRepository = workOrderRepository;
         _logger = logger;
     }
 
@@ -29,13 +32,11 @@ public class ReportService : IReportService
     {
         _logger.LogInformation("Rapport genereren voor team {TeamId} van {From} tot {To}", teamId, from, to);
 
-        var team = await _context.ServiceTeams.FindAsync(teamId);
+        var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
             throw new KeyNotFoundException($"Team met id {teamId} niet gevonden.");
 
-        var workOrders = await _context.WorkOrders
-            .Where(w => w.ServiceTeamId == teamId && w.CreatedAt >= from && w.CreatedAt <= to)
-            .ToListAsync();
+        var workOrders = await _workOrderRepository.GetByTeamAndPeriodAsync(teamId, from, to);
 
         // Verwerk statistieken
         var byStatus = workOrders
