@@ -1,6 +1,6 @@
 # CovAuto API
 
-Een .NET 8 Web API voor het beheren van werkorders (werkorders) en servicetechnici (monteurs).
+Een .NET 10 Web API voor het beheren van werkorders (werkorders) en servicetechnici (monteurs).
 
 ## Wat doet dit project?
 
