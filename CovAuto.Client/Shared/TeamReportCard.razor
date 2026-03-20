@@ -1,0 +1,39 @@
+@if (Report != null)
+{
+<div class="card shadow-sm mb-3">
+    <div class="card-header">
+        <strong>@Report.TeamName</strong>
+        <small class="text-muted ms-2">@Report.From.ToString("dd-MM-yyyy") – @Report.To.ToString("dd-MM-yyyy")</small>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <dl class="row mb-0">
+                    <dt class="col-6">Werkorders</dt>
+                    <dd class="col-6">@Report.TotalWorkOrders</dd>
+                    <dt class="col-6">Totaal uren</dt>
+                    <dd class="col-6">@Report.TotalEstimatedHours</dd>
+                </dl>
+            </div>
+            <div class="col-md-4">
+                <small class="fw-bold">Per status:</small>
+                @foreach (var kv in Report.WorkOrdersByStatus)
+                {
+                    <div><span class="badge bg-secondary me-1">@kv.Key</span> @kv.Value</div>
+                }
+            </div>
+            <div class="col-md-4">
+                <small class="fw-bold">Per prioriteit:</small>
+                @foreach (var kv in Report.WorkOrdersByPriority)
+                {
+                    <div><span class="badge bg-warning text-dark me-1">@kv.Key</span> @kv.Value</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@code {
+    [Parameter, EditorRequired] public TeamReportDto Report { get; set; } = null!;
+}

@@ -1,0 +1,23 @@
+@inherits LayoutComponentBase
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized>
+        <div class="layout-wrapper">
+            <NavMenu />
+            <main class="main-content">
+                <div class="container-fluid py-3">
+                    @Body
+                </div>
+            </main>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <main class="main-content">
+            <div class="container-fluid py-3">
+                @Body
+            </div>
+        </main>
+    </NotAuthorized>
+</AuthorizeView>

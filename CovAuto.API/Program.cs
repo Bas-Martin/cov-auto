@@ -10,6 +10,17 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- CORS for Blazor WASM client ---
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("BlazorClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:5264", "https://localhost:7124")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // --- Controllers ---
 builder.Services.AddControllers();
 
@@ -104,6 +115,8 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty; // Swagger op root URL
     });
 }
+
+app.UseCors("BlazorClient");
 
 app.UseAuthentication();
 app.UseAuthorization();

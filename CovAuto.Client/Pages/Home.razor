@@ -1,0 +1,52 @@
+@page "/"
+@attribute [Authorize]
+
+<PageTitle>Dashboard – CovAuto</PageTitle>
+
+<h2>Dashboard</h2>
+
+<AuthorizeView Context="authCtx">
+    <Authorized>
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Welkom, <strong>@authCtx.User.Identity?.Name</strong>!
+                    U bent ingelogd als <strong>@authCtx.User.FindFirst(ClaimTypes.Role)?.Value</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">📋 Werkorders</h5>
+                        <p class="card-text text-muted">Bekijk en beheer werkorders. Filter op status, prioriteit en meer.</p>
+                        <a href="werkorders" class="btn btn-primary btn-sm">Naar werkorders</a>
+                    </div>
+                </div>
+            </div>
+
+            <AuthorizeView Roles="Planner">
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">👥 Teams</h5>
+                            <p class="card-text text-muted">Bekijk alle serviceteams en hun monteurs.</p>
+                            <a href="teams" class="btn btn-primary btn-sm">Naar teams</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">📊 Rapporten</h5>
+                            <p class="card-text text-muted">Genereer team- en bulk-rapporten. Vergelijk sequentiële vs. parallelle verwerking.</p>
+                            <a href="rapporten" class="btn btn-primary btn-sm">Naar rapporten</a>
+                        </div>
+                    </div>
+                </div>
+            </AuthorizeView>
+        </div>
+    </Authorized>
+</AuthorizeView>
