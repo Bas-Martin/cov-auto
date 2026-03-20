@@ -1,0 +1,232 @@
+### ========================================
+### CovAuto API - HTTP Request voorbeelden
+### ========================================
+### Gebruik in VS Code met de REST Client extensie
+### of importeer in Postman / Bruno.
+###
+### Alle wachtwoorden: Demo1234!
+### ========================================
+
+@baseUrl = http://localhost:5000
+@plannerToken = VERVANG_MET_TOKEN_UIT_LOGIN
+@monteurToken = VERVANG_MET_TOKEN_UIT_LOGIN
+
+# ========================================
+# 1. AUTHENTICATIE
+# ========================================
+
+### Login als planner (Noord)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "planner.noord",
+  "password": "Demo1234!"
+}
+
+###
+
+### Login als monteur (Jan - Noord team)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "monteur.jan",
+  "password": "Demo1234!"
+}
+
+###
+
+### Login als monteur (Sven - Zuid team)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "monteur.sven",
+  "password": "Demo1234!"
+}
+
+# ========================================
+# 2. TEAMS
+# ========================================
+
+### Alle teams ophalen (alleen Planner)
+GET {{baseUrl}}/teams
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Team 1 ophalen (Noord Service)
+GET {{baseUrl}}/teams/1
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Team 2 ophalen (Zuid Service)
+GET {{baseUrl}}/teams/2
+Authorization: Bearer {{plannerToken}}
+
+# ========================================
+# 3. WERKORDERS - Basisoperaties
+# ========================================
+
+### Alle werkorders ophalen (standaard: pagina 1, 10 per pagina, gesorteerd op createdAt desc)
+GET {{baseUrl}}/workorders
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Één werkorder ophalen
+GET {{baseUrl}}/workorders/1
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Werkorders ophalen als monteur (alleen eigen team zichtbaar)
+GET {{baseUrl}}/workorders
+Authorization: Bearer {{monteurToken}}
+
+# ========================================
+# 4. WERKORDERS - Filtering
+# ========================================
+
+### Filter op status: Nieuw
+GET {{baseUrl}}/workorders?status=Nieuw
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Filter op prioriteit: Kritiek
+GET {{baseUrl}}/workorders?priority=Kritiek
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Filter op titel (bevat "ketel")
+GET {{baseUrl}}/workorders?title=ketel
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Filter op klantnaam
+GET {{baseUrl}}/workorders?customerName=Fam
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Filter op geschatte uren (tussen 3 en 6 uur)
+GET {{baseUrl}}/workorders?minEstimatedHours=3&maxEstimatedHours=6
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Combineer meerdere filters
+GET {{baseUrl}}/workorders?status=Gepland&priority=Normaal&minEstimatedHours=4
+Authorization: Bearer {{plannerToken}}
+
+# ========================================
+# 5. WERKORDERS - Sorting
+# ========================================
+
+### Sorteer op titel (A-Z)
+GET {{baseUrl}}/workorders?sortBy=title&sortDirection=asc
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Sorteer op geschatte uren (hoogste eerst)
+GET {{baseUrl}}/workorders?sortBy=estimatedHours&sortDirection=desc
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Sorteer op geplande datum (vroegste eerst)
+GET {{baseUrl}}/workorders?sortBy=scheduledFor&sortDirection=asc
+Authorization: Bearer {{plannerToken}}
+
+# ========================================
+# 6. WERKORDERS - Pagination
+# ========================================
+
+### Pagina 1, 5 items per pagina
+GET {{baseUrl}}/workorders?page=1&pageSize=5
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Pagina 2, 5 items per pagina
+GET {{baseUrl}}/workorders?page=2&pageSize=5
+Authorization: Bearer {{plannerToken}}
+
+###
+
+### Combineer alles: filter + sorteer + pagineer
+GET {{baseUrl}}/workorders?status=Nieuw&sortBy=estimatedHours&sortDirection=asc&page=1&pageSize=3
+Authorization: Bearer {{plannerToken}}
+
+# ========================================
+# 7. WERKORDERS - Aanmaken
+# ========================================
+
+### Nieuwe werkorder aanmaken (alleen Planner)
+POST {{baseUrl}}/workorders
+Authorization: Bearer {{plannerToken}}
+Content-Type: application/json
+
+{
+  "title": "Installatie zonneboiler",
+  "description": "Nieuwe zonneboiler installeren op het dak.",
+  "estimatedHours": 5.5,
+  "status": 0,
+  "priority": 2,
+  "scheduledFor": "2024-03-01T09:00:00Z",
+  "customerName": "Fam. Pietersen",
+  "address": "Zonnelaan 42, Utrecht",
+  "serviceTeamId": 1
+}
+
+# ========================================
+# 8. RAPPORTEN (alleen Planner)
+# ========================================
+
+### Rapport voor team Noord (teamId = 1) over januari 2024
+POST {{baseUrl}}/reports/workorders/team/1
+Authorization: Bearer {{plannerToken}}
+Content-Type: application/json
+
+{
+  "from": "2024-01-01T00:00:00Z",
+  "to": "2024-01-31T23:59:59Z"
+}
+
+###
+
+### Rapport voor team Zuid (teamId = 2) over januari 2024
+POST {{baseUrl}}/reports/workorders/team/2
+Authorization: Bearer {{plannerToken}}
+Content-Type: application/json
+
+{
+  "from": "2024-01-01T00:00:00Z",
+  "to": "2024-01-31T23:59:59Z"
+}
+
+###
+
+### Bulk rapporten PARALLEL voor beide teams
+POST {{baseUrl}}/reports/workorders/bulk
+Authorization: Bearer {{plannerToken}}
+Content-Type: application/json
+
+{
+  "teamIds": [1, 2],
+  "from": "2024-01-01T00:00:00Z",
+  "to": "2024-12-31T23:59:59Z"
+}
+
+###
+
+### Performance vergelijking: sequentieel vs. parallel
+### Laat zien hoe Task.WhenAll sneller is dan één voor één await
+GET {{baseUrl}}/reports/performance-comparison
+Authorization: Bearer {{plannerToken}}

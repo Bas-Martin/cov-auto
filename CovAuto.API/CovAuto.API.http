@@ -1,0 +1,6 @@
+@CovAuto.API_HostAddress = http://localhost:5239
+
+GET {{CovAuto.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
