@@ -1,0 +1,202 @@
+@page "/rapporten"
+@attribute [Authorize(Roles = "Planner")]
+@inject ReportApiService ReportService
+@inject TeamApiService TeamService
+
+<PageTitle>Rapporten – CovAuto</PageTitle>
+
+<h2>📊 Rapporten</h2>
+
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+        <button class="nav-link @(_tab == 0 ? "active" : "")" @onclick="() => _tab = 0">Team rapport</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link @(_tab == 1 ? "active" : "")" @onclick="() => _tab = 1">Bulk rapport</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link @(_tab == 2 ? "active" : "")" @onclick="() => _tab = 2">⚡ Performance</button>
+    </li>
+</ul>
+
+@if (_tab == 0)
+{
+    <div class="card shadow-sm mb-4" style="max-width: 500px;">
+        <div class="card-header">Rapport genereren voor één team</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Team</label>
+                <select class="form-select" @bind="_teamReportTeamId">
+                    <option value="0">-- Kies team --</option>
+                    @if (_teams != null)
+                    {
+                        @foreach (var t in _teams) { <option value="@t.Id">@t.Name</option> }
+                    }
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Van</label>
+                <input type="date" class="form-control" @bind="_teamFrom" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tot</label>
+                <input type="date" class="form-control" @bind="_teamTo" />
+            </div>
+            <button class="btn btn-primary" @onclick="GenerateTeamReport" disabled="@_loadingReport">
+                @if (_loadingReport) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                Genereren
+            </button>
+        </div>
+    </div>
+
+    @if (_teamReport != null) { <TeamReportCard Report="_teamReport" /> }
+}
+
+@if (_tab == 1)
+{
+    <div class="card shadow-sm mb-4" style="max-width: 500px;">
+        <div class="card-header">Bulk rapport (alle teams parallel)</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Teams</label>
+                @if (_teams != null)
+                {
+                    @foreach (var t in _teams)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   checked="@_bulkTeamIds.Contains(t.Id)"
+                                   @onchange="e => ToggleTeam(t.Id, (bool)e.Value!)" />
+                            <label class="form-check-label">@t.Name</label>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Van</label>
+                <input type="date" class="form-control" @bind="_bulkFrom" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tot</label>
+                <input type="date" class="form-control" @bind="_bulkTo" />
+            </div>
+            <button class="btn btn-primary" @onclick="GenerateBulkReport" disabled="@_loadingReport">
+                @if (_loadingReport) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                Genereren
+            </button>
+        </div>
+    </div>
+
+    @if (_bulkReports != null)
+    {
+        @foreach (var r in _bulkReports) { <TeamReportCard Report="r" /> }
+    }
+}
+
+@if (_tab == 2)
+{
+    <div class="card shadow-sm mb-4" style="max-width: 550px;">
+        <div class="card-header">⚡ Sequentieel vs. Parallel</div>
+        <div class="card-body">
+            <p class="text-muted">Vergelijkt de verwerkingstijd van sequentieel vs. parallel genereren van rapporten voor alle teams.</p>
+            <button class="btn btn-primary" @onclick="RunComparison" disabled="@_loadingComparison">
+                @if (_loadingComparison) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                Uitvoeren
+            </button>
+        </div>
+    </div>
+
+    @if (_comparison != null)
+    {
+        <div class="card border-success shadow-sm" style="max-width: 500px;">
+            <div class="card-header bg-success text-white">Resultaat</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-7">Sequentieel</dt>
+                    <dd class="col-sm-5">@_comparison.SequentialDurationMs ms</dd>
+                    <dt class="col-sm-7">Parallel</dt>
+                    <dd class="col-sm-5">@_comparison.ParallelDurationMs ms</dd>
+                    <dt class="col-sm-7">Verschil</dt>
+                    <dd class="col-sm-5 text-success fw-bold">@_comparison.DifferenceMs ms sneller</dd>
+                </dl>
+                <hr />
+                <p class="mb-0">@_comparison.Summary</p>
+            </div>
+        </div>
+    }
+}
+
+@if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger mt-3">@_error</div>
+}
+
+@code {
+    private int _tab = 0;
+    private IEnumerable<ServiceTeamDto>? _teams;
+    private bool _loadingReport;
+    private bool _loadingComparison;
+    private string? _error;
+
+    private int _teamReportTeamId;
+    private DateTime _teamFrom = DateTime.Today.AddMonths(-1);
+    private DateTime _teamTo = DateTime.Today;
+    private TeamReportDto? _teamReport;
+
+    private readonly HashSet<int> _bulkTeamIds = new();
+    private DateTime _bulkFrom = DateTime.Today.AddMonths(-1);
+    private DateTime _bulkTo = DateTime.Today;
+    private IEnumerable<TeamReportDto>? _bulkReports;
+
+    private PerformanceComparisonDto? _comparison;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await TeamService.GetTeamsAsync();
+        _teams = result?.Data;
+    }
+
+    private void ToggleTeam(int id, bool add)
+    {
+        if (add) _bulkTeamIds.Add(id);
+        else _bulkTeamIds.Remove(id);
+    }
+
+    private async Task GenerateTeamReport()
+    {
+        if (_teamReportTeamId == 0) { _error = "Kies een team."; return; }
+        _loadingReport = true; _error = null;
+        try
+        {
+            var result = await ReportService.GenerateTeamReportAsync(_teamReportTeamId, new TeamReportRequest { From = _teamFrom.ToUniversalTime(), To = _teamTo.ToUniversalTime() });
+            _teamReport = result?.Data;
+        }
+        catch (Exception ex) { _error = ex.Message; }
+        finally { _loadingReport = false; }
+    }
+
+    private async Task GenerateBulkReport()
+    {
+        if (!_bulkTeamIds.Any()) { _error = "Selecteer minimaal één team."; return; }
+        _loadingReport = true; _error = null;
+        try
+        {
+            var result = await ReportService.GenerateBulkReportsAsync(new BulkReportRequest { TeamIds = _bulkTeamIds.ToList(), From = _bulkFrom.ToUniversalTime(), To = _bulkTo.ToUniversalTime() });
+            _bulkReports = result?.Data;
+        }
+        catch (Exception ex) { _error = ex.Message; }
+        finally { _loadingReport = false; }
+    }
+
+    private async Task RunComparison()
+    {
+        _loadingComparison = true; _error = null;
+        try
+        {
+            var result = await ReportService.GetPerformanceComparisonAsync();
+            _comparison = result?.Data;
+        }
+        catch (Exception ex) { _error = ex.Message; }
+        finally { _loadingComparison = false; }
+    }
+}

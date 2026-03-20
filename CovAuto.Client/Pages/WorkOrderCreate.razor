@@ -1,0 +1,137 @@
+@page "/werkorders/nieuw"
+@attribute [Authorize(Roles = "Planner")]
+@inject WorkOrderApiService WorkOrderService
+@inject TeamApiService TeamService
+@inject NavigationManager Navigation
+
+<PageTitle>Nieuwe werkorder – CovAuto</PageTitle>
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="werkorders">Werkorders</a></li>
+        <li class="breadcrumb-item active">Nieuwe werkorder</li>
+    </ol>
+</nav>
+
+<h2>+ Nieuwe werkorder</h2>
+
+@if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger">@_error</div>
+}
+
+<div class="card shadow-sm" style="max-width: 700px;">
+    <div class="card-body">
+        <EditForm Model="_model" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label">Titel <span class="text-danger">*</span></label>
+                <InputText class="form-control" @bind-Value="_model.Title" />
+                <ValidationMessage For="() => _model.Title" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Beschrijving</label>
+                <InputTextArea class="form-control" @bind-Value="_model.Description" rows="3" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Status</label>
+                    <InputSelect class="form-select" @bind-Value="_model.Status">
+                        <option>Nieuw</option>
+                        <option>Gepland</option>
+                        <option>InUitvoering</option>
+                        <option>Voltooid</option>
+                        <option>Geannuleerd</option>
+                    </InputSelect>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Prioriteit</label>
+                    <InputSelect class="form-select" @bind-Value="_model.Priority">
+                        <option>Laag</option>
+                        <option>Normaal</option>
+                        <option>Hoog</option>
+                        <option>Kritiek</option>
+                    </InputSelect>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Geschatte uren <span class="text-danger">*</span></label>
+                    <InputNumber class="form-control" @bind-Value="_model.EstimatedHours" />
+                    <ValidationMessage For="() => _model.EstimatedHours" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Gepland voor</label>
+                    <InputDate class="form-control" @bind-Value="_model.ScheduledFor" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Klantnaam <span class="text-danger">*</span></label>
+                <InputText class="form-control" @bind-Value="_model.CustomerName" />
+                <ValidationMessage For="() => _model.CustomerName" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Adres <span class="text-danger">*</span></label>
+                <InputText class="form-control" @bind-Value="_model.Address" />
+                <ValidationMessage For="() => _model.Address" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Team <span class="text-danger">*</span></label>
+                <InputSelect class="form-select" @bind-Value="_model.ServiceTeamId">
+                    <option value="0">-- Kies een team --</option>
+                    @if (_teams != null)
+                    {
+                        @foreach (var team in _teams)
+                        {
+                            <option value="@team.Id">@team.Name</option>
+                        }
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => _model.ServiceTeamId" />
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success" disabled="@_saving">
+                    @if (_saving) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                    Opslaan
+                </button>
+                <a href="werkorders" class="btn btn-secondary">Annuleren</a>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private readonly CreateWorkOrderRequest _model = new();
+    private IEnumerable<ServiceTeamDto>? _teams;
+    private string? _error;
+    private bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await TeamService.GetTeamsAsync();
+        _teams = result?.Data;
+    }
+
+    private async Task HandleSubmit()
+    {
+        _saving = true;
+        _error = null;
+
+        var (success, data, error) = await WorkOrderService.CreateWorkOrderAsync(_model);
+        if (success && data != null)
+            Navigation.NavigateTo($"werkorders/{data.Id}");
+        else
+        {
+            _error = error;
+            _saving = false;
+        }
+    }
+}

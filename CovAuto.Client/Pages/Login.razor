@@ -1,0 +1,78 @@
+@page "/login"
+@layout Layout.MainLayout
+
+<PageTitle>Inloggen – CovAuto</PageTitle>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🔧 CovAuto – Inloggen</h5>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger">@_errorMessage</div>
+                }
+
+                <EditForm Model="_model" OnValidSubmit="HandleLogin">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label class="form-label">Gebruikersnaam</label>
+                        <InputText class="form-control" @bind-Value="_model.Username" placeholder="bijv. jan.monteur" />
+                        <ValidationMessage For="() => _model.Username" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Wachtwoord</label>
+                        <InputText type="password" class="form-control" @bind-Value="_model.Password" />
+                        <ValidationMessage For="() => _model.Password" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" disabled="@_loading">
+                        @if (_loading) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                        Inloggen
+                    </button>
+                </EditForm>
+
+                <hr />
+                <small class="text-muted">
+                    <strong>Demo-accounts:</strong><br />
+                    Planner: <code>lisa.planner</code> / <code>Planner123!</code><br />
+                    Monteur: <code>jan.monteur</code> / <code>Monteur123!</code>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+@code {
+    private readonly LoginRequest _model = new();
+    private string? _errorMessage;
+    private bool _loading;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private async Task HandleLogin()
+    {
+        _loading = true;
+        _errorMessage = null;
+
+        var (success, error) = await AuthService.LoginAsync(_model);
+
+        if (success)
+        {
+            Navigation.NavigateTo(ReturnUrl ?? "/", forceLoad: false);
+        }
+        else
+        {
+            _errorMessage = error;
+            _loading = false;
+        }
+    }
+}

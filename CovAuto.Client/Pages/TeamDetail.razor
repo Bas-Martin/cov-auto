@@ -1,0 +1,82 @@
+@page "/teams/{TeamId:int}"
+@attribute [Authorize]
+@inject TeamApiService TeamService
+
+<PageTitle>Team details – CovAuto</PageTitle>
+
+@if (_loading)
+{
+    <div class="text-center py-4"><div class="spinner-border" role="status"></div></div>
+}
+else if (_error != null)
+{
+    <div class="alert alert-danger">@_error</div>
+}
+else if (_team != null)
+{
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="teams">Teams</a></li>
+            <li class="breadcrumb-item active">@_team.Name</li>
+        </ol>
+    </nav>
+
+    <h2>@_team.Name</h2>
+    <p class="text-muted">@_team.Description</p>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">ℹ️ Team info</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Planner</dt>
+                        <dd class="col-sm-7">@_team.PlannerName</dd>
+                        <dt class="col-sm-5">Monteurs</dt>
+                        <dd class="col-sm-7">@_team.Members.Count</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">👷 Monteurs</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var m in _team.Members)
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>@m.FullName</span>
+                            <small class="text-muted">@@m.Username</small>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int TeamId { get; set; }
+
+    private ServiceTeamDto? _team;
+    private bool _loading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await TeamService.GetTeamAsync(TeamId);
+            if (result?.Success == true)
+                _team = result.Data;
+            else
+                _error = result?.Message ?? "Team niet gevonden.";
+        }
+        catch (Exception ex)
+        {
+            _error = $"Fout: {ex.Message}";
+        }
+        finally { _loading = false; }
+    }
+}

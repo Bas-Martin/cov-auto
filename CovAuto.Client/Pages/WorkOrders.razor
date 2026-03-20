@@ -1,0 +1,186 @@
+@page "/werkorders"
+@attribute [Authorize]
+@inject WorkOrderApiService WorkOrderService
+
+<PageTitle>Werkorders – CovAuto</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>📋 Werkorders</h2>
+    <AuthorizeView Roles="Planner">
+        <a href="werkorders/nieuw" class="btn btn-success btn-sm">+ Nieuwe werkorder</a>
+    </AuthorizeView>
+</div>
+
+<!-- Filter controls -->
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select form-select-sm" @bind="_query.Status">
+                    <option value="">Alle</option>
+                    <option>Nieuw</option>
+                    <option>Gepland</option>
+                    <option>InUitvoering</option>
+                    <option>Voltooid</option>
+                    <option>Geannuleerd</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Prioriteit</label>
+                <select class="form-select form-select-sm" @bind="_query.Priority">
+                    <option value="">Alle</option>
+                    <option>Laag</option>
+                    <option>Normaal</option>
+                    <option>Hoog</option>
+                    <option>Kritiek</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Klant</label>
+                <input class="form-control form-control-sm" @bind="_query.CustomerName" placeholder="Klantnaam..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sorteer op</label>
+                <div class="input-group input-group-sm">
+                    <select class="form-select" @bind="_query.SortBy">
+                        <option value="createdAt">Aangemaakt</option>
+                        <option value="title">Titel</option>
+                        <option value="estimatedHours">Uren</option>
+                        <option value="scheduledFor">Gepland</option>
+                    </select>
+                    <select class="form-select" @bind="_query.SortDirection">
+                        <option value="desc">↓</option>
+                        <option value="asc">↑</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-12 text-end">
+                <button class="btn btn-primary btn-sm me-2" @onclick="Search">🔍 Zoeken</button>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="Reset">↺ Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (_loading)
+{
+    <div class="text-center py-4"><div class="spinner-border" role="status"></div></div>
+}
+else if (_error != null)
+{
+    <div class="alert alert-danger">@_error</div>
+}
+else if (_result != null)
+{
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <small class="text-muted">@_result.TotalCount resultaten · Pagina @_result.Page van @_result.TotalPages</small>
+    </div>
+
+    @if (!_result.Items.Any())
+    {
+        <div class="alert alert-info">Geen werkorders gevonden.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Titel</th>
+                        <th>Klant</th>
+                        <th>Status</th>
+                        <th>Prioriteit</th>
+                        <th>Team</th>
+                        <th>Uren</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var wo in _result.Items)
+                    {
+                        <tr>
+                            <td>@wo.Id</td>
+                            <td>@wo.Title</td>
+                            <td>@wo.CustomerName</td>
+                            <td><span class="badge @StatusBadge(wo.Status)">@wo.Status</span></td>
+                            <td><span class="badge @PriorityBadge(wo.Priority)">@wo.Priority</span></td>
+                            <td>@wo.ServiceTeamName</td>
+                            <td>@wo.EstimatedHours</td>
+                            <td><a href="werkorders/@wo.Id" class="btn btn-xs btn-outline-primary btn-sm py-0 px-1">Details</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (_result.TotalPages > 1)
+        {
+            <nav>
+                <ul class="pagination pagination-sm">
+                    <li class="page-item @(_result.Page <= 1 ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => GoToPage(_result.Page - 1)">«</button>
+                    </li>
+                    @for (int p = 1; p <= _result.TotalPages; p++)
+                    {
+                        var page = p;
+                        <li class="page-item @(page == _result.Page ? "active" : "")">
+                            <button class="page-link" @onclick="() => GoToPage(page)">@(page)</button>
+                        </li>
+                    }
+                    <li class="page-item @(_result.Page >= _result.TotalPages ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => GoToPage(_result.Page + 1)">»</button>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+}
+
+@code {
+    private WorkOrderQueryParameters _query = new();
+    private PagedResult<WorkOrderDto>? _result;
+    private bool _loading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task Search() { _query.Page = 1; await LoadAsync(); }
+
+    private async Task Reset() { _query = new(); await LoadAsync(); }
+
+    private async Task GoToPage(int page) { _query.Page = page; await LoadAsync(); }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            var response = await WorkOrderService.GetWorkOrdersAsync(_query);
+            _result = response?.Data;
+        }
+        catch (Exception ex) { _error = $"Fout: {ex.Message}"; }
+        finally { _loading = false; }
+    }
+
+    private static string StatusBadge(string status) => status switch
+    {
+        "Nieuw" => "bg-info text-dark",
+        "Gepland" => "bg-primary",
+        "InUitvoering" => "bg-warning text-dark",
+        "Voltooid" => "bg-success",
+        "Geannuleerd" => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+
+    private static string PriorityBadge(string priority) => priority switch
+    {
+        "Kritiek" => "bg-danger",
+        "Hoog" => "bg-warning text-dark",
+        "Normaal" => "bg-primary",
+        "Laag" => "bg-secondary",
+        _ => "bg-light text-dark"
+    };
+}
