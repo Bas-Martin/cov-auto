@@ -75,11 +75,16 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
             if (kvp.Value.ValueKind == JsonValueKind.Array)
             {
                 foreach (var item in kvp.Value.EnumerateArray())
-                    claims.Add(new Claim(claimType, item.GetString() ?? string.Empty));
+                    claims.Add(new Claim(claimType, item.ValueKind == JsonValueKind.String
+                        ? item.GetString() ?? string.Empty
+                        : item.ToString()));
             }
-            else
+            else if (kvp.Value.ValueKind != JsonValueKind.Null)
             {
-                claims.Add(new Claim(claimType, kvp.Value.GetString() ?? kvp.Value.ToString()));
+                var value = kvp.Value.ValueKind == JsonValueKind.String
+                    ? kvp.Value.GetString() ?? string.Empty
+                    : kvp.Value.ToString();
+                claims.Add(new Claim(claimType, value));
             }
         }
 

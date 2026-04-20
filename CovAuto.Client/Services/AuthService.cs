@@ -17,6 +17,7 @@ public class AuthService
 
     public async Task<(bool Success, string? ErrorMessage)> LoginAsync(LoginRequest request)
     {
+        LoginResponse? loginData;
         try
         {
             var response = await _http.PostAsJsonAsync("auth/login", request);
@@ -24,18 +25,18 @@ public class AuthService
                 return (false, "Ongeldige gebruikersnaam of wachtwoord.");
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<LoginResponse>>();
-            if (result?.Success == true && result.Data?.Token != null)
-            {
-                await _authStateProvider.MarkUserAsAuthenticated(result.Data.Token);
-                return (true, null);
-            }
+            if (result?.Success != true || result.Data?.Token == null)
+                return (false, result?.Message ?? "Inloggen mislukt.");
 
-            return (false, result?.Message ?? "Inloggen mislukt.");
+            loginData = result.Data;
         }
         catch
         {
             return (false, "Kan geen verbinding maken met de API. Zorg dat de API actief is op http://localhost:5239.");
         }
+
+        await _authStateProvider.MarkUserAsAuthenticated(loginData.Token);
+        return (true, null);
     }
 
     public async Task LogoutAsync()

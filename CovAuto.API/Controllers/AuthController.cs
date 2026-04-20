@@ -1,6 +1,7 @@
 using CovAuto.API.Application.DTOs;
 using CovAuto.API.Application.Interfaces;
 using CovAuto.API.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CovAuto.API.Controllers;
@@ -20,6 +21,7 @@ public class AuthController : ControllerBase
     /// Inloggen en JWT token ophalen.
     /// </summary>
     [HttpPost("login")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<LoginResponse>), 200)]
     [ProducesResponseType(401)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
