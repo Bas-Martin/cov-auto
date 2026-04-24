@@ -1,6 +1,7 @@
 @page "/werkorders"
 @attribute [Authorize]
-@inject WorkOrderApiService WorkOrderService
+@inject HttpClient Http
+@inject JwtAuthStateProvider AuthStateProvider
 
 <PageTitle>Werkorders – CovAuto</PageTitle>
 
@@ -158,7 +159,11 @@ else if (_result != null)
         _error = null;
         try
         {
-            var response = await WorkOrderService.GetWorkOrdersAsync(_query);
+            var token = await AuthStateProvider.GetTokenAsync();
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var url = $"workorders?{_query.ToQueryString()}";
+            var response = await Http.GetFromJsonAsync<ApiResponse<PagedResult<WorkOrderDto>>>(url);
             _result = response?.Data;
         }
         catch (Exception ex) { _error = $"Fout: {ex.Message}"; }

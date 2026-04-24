@@ -1,7 +1,7 @@
 @page "/werkorders/nieuw"
 @attribute [Authorize(Roles = "Planner")]
-@inject WorkOrderApiService WorkOrderService
-@inject TeamApiService TeamService
+@inject HttpClient Http
+@inject JwtAuthStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 
 <PageTitle>Nieuwe werkorder – CovAuto</PageTitle>
@@ -116,7 +116,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await TeamService.GetTeamsAsync();
+        var token = await AuthStateProvider.GetTokenAsync();
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var result = await Http.GetFromJsonAsync<ApiResponse<IEnumerable<ServiceTeamDto>>>("teams");
         _teams = result?.Data;
     }
 
@@ -125,12 +128,24 @@
         _saving = true;
         _error = null;
 
-        var (success, data, error) = await WorkOrderService.CreateWorkOrderAsync(_model);
-        if (success && data != null)
-            Navigation.NavigateTo($"werkorders/{data.Id}");
+        var token = await AuthStateProvider.GetTokenAsync();
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var response = await Http.PostAsJsonAsync("workorders", _model);
+        if (!response.IsSuccessStatusCode)
+        {
+            var err = await response.Content.ReadFromJsonAsync<ApiResponse<string>>();
+            _error = err?.Message ?? "Aanmaken mislukt.";
+            _saving = false;
+            return;
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<ApiResponse<WorkOrderDto>>();
+        if (result?.Data != null)
+            Navigation.NavigateTo($"werkorders/{result.Data.Id}");
         else
         {
-            _error = error;
+            _error = "Aanmaken mislukt.";
             _saving = false;
         }
     }

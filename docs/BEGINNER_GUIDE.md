@@ -48,7 +48,7 @@ In de Blazor client regelt één bestand de authenticatie:
 |---------|------|
 | `Auth/JwtAuthStateProvider.cs` | Slaat het token op in `sessionStorage` en vertelt Blazor wie er ingelogd is |
 
-Elke API-service (`WorkOrderApiService`, `TeamApiService`, `ReportApiService`) haalt het token zelf op via `JwtAuthStateProvider` en zet het als `Authorization: Bearer <token>` header vóór elke aanroep. Zo is direct per methode zichtbaar dat een token nodig is.
+Elke pagina injecteert `HttpClient` en `JwtAuthStateProvider` direct. Vóór elke API-aanroep haalt de pagina het token op en zet het als `Authorization: Bearer <token>` header. Zo is in de pagina zelf direct te zien dat een token nodig is.
 
 ---
 

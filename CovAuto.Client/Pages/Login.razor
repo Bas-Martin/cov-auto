@@ -47,7 +47,8 @@
     </div>
 </div>
 
-@inject AuthService AuthService
+@inject HttpClient Http
+@inject JwtAuthStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 
 @code {
@@ -63,15 +64,30 @@
         _loading = true;
         _errorMessage = null;
 
-        var (success, error) = await AuthService.LoginAsync(_model);
-
-        if (success)
+        try
         {
+            var response = await Http.PostAsJsonAsync("auth/login", _model);
+            if (!response.IsSuccessStatusCode)
+            {
+                _errorMessage = "Ongeldige gebruikersnaam of wachtwoord.";
+                _loading = false;
+                return;
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<LoginResponse>>();
+            if (result?.Success != true || result.Data?.Token == null)
+            {
+                _errorMessage = result?.Message ?? "Inloggen mislukt.";
+                _loading = false;
+                return;
+            }
+
+            await AuthStateProvider.MarkUserAsAuthenticated(result.Data.Token);
             Navigation.NavigateTo(ReturnUrl ?? "/", forceLoad: false);
         }
-        else
+        catch
         {
-            _errorMessage = error;
+            _errorMessage = "Kan geen verbinding maken met de API. Zorg dat de API actief is op http://localhost:5239.";
             _loading = false;
         }
     }

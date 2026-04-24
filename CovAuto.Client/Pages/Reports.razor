@@ -1,7 +1,7 @@
 @page "/rapporten"
 @attribute [Authorize(Roles = "Planner")]
-@inject ReportApiService ReportService
-@inject TeamApiService TeamService
+@inject HttpClient Http
+@inject JwtAuthStateProvider AuthStateProvider
 
 <PageTitle>Rapporten – CovAuto</PageTitle>
 
@@ -152,7 +152,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await TeamService.GetTeamsAsync();
+        var token = await AuthStateProvider.GetTokenAsync();
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var result = await Http.GetFromJsonAsync<ApiResponse<IEnumerable<ServiceTeamDto>>>("teams");
         _teams = result?.Data;
     }
 
@@ -168,8 +171,16 @@
         _loadingReport = true; _error = null;
         try
         {
-            var result = await ReportService.GenerateTeamReportAsync(_teamReportTeamId, new TeamReportRequest { From = _teamFrom.ToUniversalTime(), To = _teamTo.ToUniversalTime() });
-            _teamReport = result?.Data;
+            var token = await AuthStateProvider.GetTokenAsync();
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var request = new TeamReportRequest { From = _teamFrom.ToUniversalTime(), To = _teamTo.ToUniversalTime() };
+            var response = await Http.PostAsJsonAsync($"reports/workorders/team/{_teamReportTeamId}", request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<TeamReportDto>>();
+                _teamReport = result?.Data;
+            }
         }
         catch (Exception ex) { _error = ex.Message; }
         finally { _loadingReport = false; }
@@ -181,8 +192,16 @@
         _loadingReport = true; _error = null;
         try
         {
-            var result = await ReportService.GenerateBulkReportsAsync(new BulkReportRequest { TeamIds = _bulkTeamIds.ToList(), From = _bulkFrom.ToUniversalTime(), To = _bulkTo.ToUniversalTime() });
-            _bulkReports = result?.Data;
+            var token = await AuthStateProvider.GetTokenAsync();
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var request = new BulkReportRequest { TeamIds = _bulkTeamIds.ToList(), From = _bulkFrom.ToUniversalTime(), To = _bulkTo.ToUniversalTime() };
+            var response = await Http.PostAsJsonAsync("reports/workorders/bulk", request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<IEnumerable<TeamReportDto>>>();
+                _bulkReports = result?.Data;
+            }
         }
         catch (Exception ex) { _error = ex.Message; }
         finally { _loadingReport = false; }
@@ -193,7 +212,10 @@
         _loadingComparison = true; _error = null;
         try
         {
-            var result = await ReportService.GetPerformanceComparisonAsync();
+            var token = await AuthStateProvider.GetTokenAsync();
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var result = await Http.GetFromJsonAsync<ApiResponse<PerformanceComparisonDto>>("reports/performance-comparison");
             _comparison = result?.Data;
         }
         catch (Exception ex) { _error = ex.Message; }

@@ -26,8 +26,7 @@ cov-auto/
 │   └── appsettings.json       ← Configuratie (database, JWT, logging)
 │
 ├── CovAuto.Client/            ← Front-end (Blazor WebAssembly)
-│   ├── Pages/                 ← Blazor pagina's
-│   ├── Services/              ← HTTP-aanroepen naar de API
+│   ├── Pages/                 ← Blazor pagina's (bevatten ook de HTTP-aanroepen)
 │   ├── Auth/                  ← JWT opslaan en meesturen
 │   ├── Models/                ← Data-objecten (zelfde structuur als API DTOs)
 │   ├── Layout/                ← Navigatiebalk en layout
@@ -119,14 +118,18 @@ cov-auto/
 | `Pages/TeamDetail.razor` | `/teams/{id}` | Detail van één team |
 | `Pages/Reports.razor` | `/rapporten` | Rapporten genereren (alleen planner) |
 
-### Front-end: Services (API-aanroepen)
+### Front-end: Pagina's (bevatten ook de HTTP-aanroepen)
 
-| Bestand | Doel |
-|---------|------|
-| `Services/AuthService.cs` | Inloggen en uitloggen |
-| `Services/WorkOrderApiService.cs` | Werkorders ophalen/aanmaken via API |
-| `Services/TeamApiService.cs` | Teams ophalen via API |
-| `Services/ReportApiService.cs` | Rapporten opvragen via API |
+| Bestand | Route | Doel |
+|---------|-------|------|
+| `Pages/Home.razor` | `/` | Dashboard na inloggen |
+| `Pages/Login.razor` | `/login` | Inlogformulier – stuurt POST naar `auth/login` en slaat het token op |
+| `Pages/WorkOrders.razor` | `/werkorders` | Lijst van werkorders met filters – haalt werkorders op via `GET /workorders` |
+| `Pages/WorkOrderDetail.razor` | `/werkorders/{id}` | Detail van één werkorder – haalt op via `GET /workorders/{id}` |
+| `Pages/WorkOrderCreate.razor` | `/werkorders/nieuw` | Nieuwe werkorder aanmaken – POST naar `workorders` |
+| `Pages/Teams.razor` | `/teams` | Lijst van teams – haalt op via `GET /teams` |
+| `Pages/TeamDetail.razor` | `/teams/{id}` | Detail van één team – haalt op via `GET /teams/{id}` |
+| `Pages/Reports.razor` | `/rapporten` | Rapporten genereren – POST naar rapport-endpoints |
 
 ### Front-end: Authenticatie
 
@@ -134,23 +137,23 @@ cov-auto/
 |---------|------|
 | `Auth/JwtAuthStateProvider.cs` | Slaat het JWT op in browser `sessionStorage` en vertelt Blazor wie er ingelogd is |
 
-Elke API-service haalt het token op via `JwtAuthStateProvider` en zet het zelf als `Authorization: Bearer ...` header voor elke aanroep.
+Elke pagina injecteert `HttpClient` en `JwtAuthStateProvider` direct. Vóór elke API-aanroep haalt de pagina het token op en zet het als `Authorization: Bearer ...` header.
 
 ---
 
 ## Hoe stroomt data door de applicatie?
 
 ```
-Browser → Blazor pagina → ApiService → HTTP-aanroep naar API
-                                           ↓
+Browser → Blazor pagina → HTTP-aanroep naar API
+                                   ↓
 API Controller → Service → Repository → Database
-                                           ↓
-                        Entity → DTO → JSON → terug naar browser
+                                   ↓
+                Entity → DTO → JSON → terug naar browser
 ```
 
 **Voorbeeld: werkorders laden**
-1. `WorkOrders.razor` roept `WorkOrderApiService.GetWorkOrdersAsync()` aan
-2. `WorkOrderApiService` doet `GET /workorders?...` naar de API
+1. `WorkOrders.razor` haalt het JWT-token op via `JwtAuthStateProvider`
+2. `WorkOrders.razor` doet `GET /workorders?...` met het token als `Authorization: Bearer` header
 3. `WorkOrdersController.GetWorkOrders()` ontvangt de aanvraag
 4. `WorkOrderService.GetWorkOrdersAsync()` wordt aangeroepen
 5. `WorkOrderRepository.GetPagedAsync()` haalt data op uit SQLite via EF Core

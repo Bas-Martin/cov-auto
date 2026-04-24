@@ -1,6 +1,7 @@
 @page "/teams/{TeamId:int}"
 @attribute [Authorize]
-@inject TeamApiService TeamService
+@inject HttpClient Http
+@inject JwtAuthStateProvider AuthStateProvider
 
 <PageTitle>Team details – CovAuto</PageTitle>
 
@@ -67,7 +68,10 @@ else if (_team != null)
     {
         try
         {
-            var result = await TeamService.GetTeamAsync(TeamId);
+            var token = await AuthStateProvider.GetTokenAsync();
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var result = await Http.GetFromJsonAsync<ApiResponse<ServiceTeamDto>>($"teams/{TeamId}");
             if (result?.Success == true)
                 _team = result.Data;
             else

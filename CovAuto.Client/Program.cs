@@ -1,5 +1,4 @@
 using CovAuto.Client.Auth;
-using CovAuto.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -15,19 +14,8 @@ builder.Services.AddSingleton<JwtAuthStateProvider>();
 builder.Services.AddSingleton<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<JwtAuthStateProvider>());
 
-// Login gebruikt geen token
-builder.Services.AddHttpClient<AuthService>(client =>
-    client.BaseAddress = new Uri(apiBaseUrl));
-
-// API-services: elke methode voegt zelf het Bearer token toe
-builder.Services.AddHttpClient<WorkOrderApiService>(client =>
-    client.BaseAddress = new Uri(apiBaseUrl));
-
-builder.Services.AddHttpClient<TeamApiService>(client =>
-    client.BaseAddress = new Uri(apiBaseUrl));
-
-builder.Services.AddHttpClient<ReportApiService>(client =>
-    client.BaseAddress = new Uri(apiBaseUrl));
+// Één gedeelde HttpClient voor alle pagina's
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 
 builder.Services.AddAuthorizationCore();
 
