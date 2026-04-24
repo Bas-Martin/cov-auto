@@ -1,24 +1,24 @@
-# Student Upgrade Guide
+# Studentengids voor de verbeterworkflow
 
-This guide explains the `/upgrade` learning workflow built into this repository.
-It shows you how to make the code gradually better — one small step at a time — using GitHub Copilot in VS Code.
-
----
-
-## What is the upgrade workflow?
-
-The upgrade workflow is a set of **reusable Copilot prompts** stored in `.github/prompts/`.
-Each prompt tells Copilot to improve the code in a specific way, without overwhelming you with too many changes at once.
-
-You do not need to know the "right answer" before you start.
-You ask for an upgrade, Copilot makes one small change, you read it, run the app, and then ask for the next one.
+Deze gids legt de `/upgrade`-leerworkflow uit die in deze repository is ingebouwd.
+Hij laat je zien hoe je de code stap voor stap kunt verbeteren — één kleine stap tegelijk — met GitHub Copilot in VS Code.
 
 ---
 
-## Why does this repo start simple?
+## Wat is de verbeterworkflow?
 
-The code in this repo is intentionally kept at a beginner level.
-For example, every Blazor page that calls the API repeats the same two lines:
+De verbeterworkflow is een set **herbruikbare Copilot-prompts** die zijn opgeslagen in `.github/prompts/`.
+Elke prompt vertelt Copilot om de code op een specifieke manier te verbeteren, zonder je te overweldigen met te veel wijzigingen tegelijk.
+
+Je hoeft het "juiste antwoord" niet van tevoren te weten.
+Je vraagt om een verbetering, Copilot maakt één kleine wijziging, je leest hem, voert de app uit, en vraagt daarna om de volgende.
+
+---
+
+## Waarom begint deze repo eenvoudig?
+
+De code in deze repo is bewust op beginnerniveau gehouden.
+Elke Blazor-pagina die de API aanroept herhaalt bijvoorbeeld dezelfde twee regels:
 
 ```csharp
 var token = await AuthStateProvider.GetTokenAsync();
@@ -26,16 +26,16 @@ Http.DefaultRequestHeaders.Authorization =
     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 ```
 
-This is not a mistake. It is the **starting point**.
-You can see exactly what happens. Nothing is hidden inside a framework class or a handler.
+Dit is geen fout. Het is het **beginpunt**.
+Je kunt precies zien wat er gebeurt. Niets is verborgen in een framework-klasse of een handler.
 
-As you run upgrades, the code gets cleaner step by step — and you understand *why* each change was made.
+Naarmate je verbeteringen uitvoert, wordt de code stap voor stap schoner — en begrijp je *waarom* elke wijziging is gemaakt.
 
 ---
 
-## Why we do not jump straight to the best pattern
+## Waarom we niet meteen naar het beste patroon springen
 
-Imagine you asked "how do I handle JWT tokens in Blazor?" and someone immediately showed you this:
+Stel je voor dat je vraagt "hoe ga ik om met JWT-tokens in Blazor?" en iemand laat je direct dit zien:
 
 ```csharp
 public class TokenAuthHandler : DelegatingHandler
@@ -57,173 +57,174 @@ public class TokenAuthHandler : DelegatingHandler
 }
 ```
 
-This is good professional code. But if you have never seen it before, you would not know:
-- What is a `DelegatingHandler`?
-- Why does it inherit that class?
-- Where does `SendAsync` get called?
-- What is `ITokenService` and where does it come from?
+Dit is goede professionele code. Maar als je het nog nooit hebt gezien, weet je niet:
+- Wat is een `DelegatingHandler`?
+- Waarom erft het van die klasse?
+- Waar wordt `SendAsync` aangeroepen?
+- Wat is `ITokenService` en waar komt het vandaan?
 
-Instead, the upgrade workflow takes you through the steps one by one:
+In plaats daarvan neemt de verbeterworkflow je stap voor stap door de stappen:
 
 ```
-Step 1: Repeated token code in every page         ← current state
-Step 2: Add comments and a null guard
-Step 3: Extract a private helper method
-Step 4: Extract a static TokenHelper class
-Step 5: Extract a TokenService (registered in DI)
-Step 6: Implement TokenAuthHandler : DelegatingHandler
-Step 7: Register typed HttpClient with the handler
-Step 8: Add 401 logout/redirect behavior
+Stap 1: Herhaalde token-code in elke pagina         ← huidige staat
+Stap 2: Opmerkingen en een null-check toevoegen
+Stap 3: Een private hulpmethode extraheren
+Stap 4: Een statische TokenHulp-klasse extraheren
+Stap 5: Een TokenService extraheren (geregistreerd in DI)
+Stap 6: TokenAuthHandler : DelegatingHandler implementeren
+Stap 7: Typed HttpClient met de handler registreren
+Stap 8: 401-uitlog/doorstuurgedrag toevoegen
 ```
 
-By the time you reach step 6, you already know *why* the handler exists.
-You have already solved the same problem three different ways. The handler is just the clean version.
+Tegen de tijd dat je stap 6 bereikt, weet je al *waarom* de handler bestaat.
+Je hebt hetzelfde probleem al drie keer op drie verschillende manieren opgelost. De handler is gewoon de nette versie.
 
 ---
 
-## How to use the prompts in VS Code Copilot Chat
+## Hoe gebruik je de prompts in VS Code Copilot Chat
 
-The prompts live in `.github/prompts/`. VS Code Copilot Chat can use them as **reusable prompt files**.
+De prompts staan in `.github/prompts/`. VS Code Copilot Chat kan ze gebruiken als **herbruikbare promptbestanden**.
 
-### Step 1 — Open Copilot Chat
+### Stap 1 — Open Copilot Chat
 
-Press `Ctrl+Alt+I` (Windows/Linux) or `Cmd+Alt+I` (Mac), or click the Copilot Chat icon in the sidebar.
+Druk op `Ctrl+Alt+I` (Windows/Linux) of `Cmd+Alt+I` (Mac), of klik op het Copilot Chat-icoon in de zijbalk.
 
-### Step 2 — Open the file you want to improve
+### Stap 2 — Open het bestand dat je wilt verbeteren
 
-For example, open `CovAuto.Client/Pages/WorkOrders.razor`.
+Open bijvoorbeeld `CovAuto.Client/Pages/WorkOrders.razor`.
 
-### Step 3 — Attach the prompt file
+### Stap 3 — Koppel het promptbestand
 
-In Copilot Chat, click the **paperclip / attach** icon and select:
+Klik in Copilot Chat op het **paperclip/bijlage**-icoon en selecteer:
 ```
 .github/prompts/upgrade.prompt.md
 ```
 
-Or type `#` in the chat input and search for the prompt file by name.
+Of typ `#` in het chatinvoerveld en zoek op de naam van het promptbestand.
 
-### Step 4 — Send
+### Stap 4 — Verstuur
 
-Press Enter. Copilot will read the current file and the prompt instructions, then make one small improvement.
+Druk op Enter. Copilot leest het huidige bestand en de promptinstructies, en maakt daarna één kleine verbetering.
 
 ---
 
-## Available prompt commands
+## Beschikbare promptopdrachten
 
-| Prompt file | What it does |
-|-------------|--------------|
-| `upgrade.prompt.md` | Makes one small improvement to the current file. Choose the smallest useful step. |
-| `upgrade-next.prompt.md` | Continues the same improvement direction one step further. |
-| `upgrade-explain.prompt.md` | Explains the next improvement **without changing any code**. Good for understanding before acting. |
-| `upgrade-token-auth.prompt.md` | Focuses only on JWT/token authentication. Uses the token auth ladder. |
+| Promptbestand | Wat het doet |
+|---------------|--------------|
+| `upgrade.prompt.md` | Maakt één kleine verbetering aan het huidige bestand. Kiest de kleinste nuttige stap. |
+| `upgrade-next.prompt.md` | Gaat één stap verder op dezelfde verbeterrichting. |
+| `upgrade-explain.prompt.md` | Legt de volgende verbetering uit **zonder code te wijzigen**. Goed voor begrip vóór actie. |
+| `upgrade-token-auth.prompt.md` | Richt zich alleen op JWT/token-authenticatie. Gebruikt de token-auth-ladder. |
 
-### How to run them
+### Hoe je ze uitvoert
 
-**Option A — Attach in Copilot Chat (recommended)**
-1. Open the file you want to improve.
+**Optie A — Koppelen in Copilot Chat (aanbevolen)**
+1. Open het bestand dat je wilt verbeteren.
 2. Open Copilot Chat (`Ctrl+Alt+I`).
-3. Click the paperclip icon → select the prompt file.
-4. Press Enter.
+3. Klik op het paperclip-icoon → selecteer het promptbestand.
+4. Druk op Enter.
 
-**Option B — Type `#` in the chat input**
-1. In Copilot Chat, type `#` and start typing the prompt name (e.g., `upgrade`).
-2. Select the matching prompt file from the dropdown.
-3. Press Enter.
+**Optie B — Typ `#` in het chatinvoerveld**
+1. Typ in Copilot Chat `#` en begin de promptnaam te typen (bijv. `upgrade`).
+2. Selecteer het overeenkomende promptbestand uit het dropdown-menu.
+3. Druk op Enter.
 
-**Option C — Copilot Edits (VS Code 1.93+)**
+**Optie C — Copilot Edits (VS Code 1.93+)**
 1. Open Copilot Edits (`Ctrl+Shift+I`).
-2. Drag the prompt file into the chat, or use `#` to attach it.
-3. Copilot Edits will apply the change directly to the file.
+2. Sleep het promptbestand naar de chat, of gebruik `#` om het te koppelen.
+3. Copilot Edits past de wijziging direct toe op het bestand.
 
-> **Note about `/upgrade` as a slash command:**
-> VS Code Copilot does not support registering arbitrary `/upgrade` slash commands from prompt files.
-> The prompts in `.github/prompts/` are reusable prompt files — not true slash commands.
-> The `/` commands in Copilot Chat are built-in commands (like `/explain`, `/fix`, `/tests`).
-> To run an upgrade, always attach the prompt file using one of the options above.
+> **Opmerking over `/upgrade` als slash-opdracht:**
+> VS Code Copilot ondersteunt geen registratie van willekeurige `/upgrade`-slash-opdrachten vanuit promptbestanden.
+> De prompts in `.github/prompts/` zijn herbruikbare promptbestanden — geen echte slash-opdrachten.
+> De `/`-opdrachten in Copilot Chat zijn ingebouwde opdrachten (zoals `/explain`, `/fix`, `/tests`).
+> Gebruik altijd één van de bovenstaande opties om een verbetering uit te voeren.
 
 ---
 
-## What to do after Copilot changes code
+## Wat je doet nadat Copilot code heeft gewijzigd
 
-1. **Read the diff.** Open the Source Control panel (`Ctrl+Shift+G`) and read what changed.
-2. **Ask "why?"** If you do not understand something, ask Copilot: "Why did you change this?"
-3. **Build the project.**
+1. **Lees de diff.** Open het bronbeheer-paneel (`Ctrl+Shift+G`) en lees wat er is veranderd.
+2. **Vraag "waarom?"** Als je iets niet begrijpt, vraag Copilot: "Waarom heb je dit gewijzigd?"
+3. **Bouw het project.**
    ```
    dotnet build CovAuto.sln
    ```
-4. **Run the app** and verify the page still works. Open the browser and click through the changed page.
-5. **If something broke,** use `Ctrl+Z` or `git checkout -- <file>` to undo, and ask Copilot to explain what went wrong.
-6. **Commit the change** if you are happy with it:
+4. **Voer de app uit** en controleer of de pagina nog werkt. Open de browser en klik door de gewijzigde pagina.
+5. **Als er iets kapot is,** gebruik `Ctrl+Z` of `git checkout -- <bestand>` om ongedaan te maken, en vraag Copilot wat er mis ging.
+6. **Commit de wijziging** als je er tevreden mee bent:
    ```
    git add .
-   git commit -m "upgrade: extract SetAuthHeader helper"
+   git commit -m "verbetering: StelTokenHeaderIn-hulpfunctie extraheren"
    ```
 
 ---
 
-## How to review a change
+## Hoe je een wijziging beoordeelt
 
-After Copilot applies an upgrade, check:
+Controleer nadat Copilot een verbetering heeft aangebracht:
 
-- Does the app still build? (`dotnet build`)
-- Does the changed page still load in the browser?
-- Does the behavior look the same? (same data, same errors, same buttons)
-- Can you explain what changed in your own words?
+- Bouwt de app nog steeds? (`dotnet build`)
+- Laadt de gewijzigde pagina nog in de browser?
+- Ziet het gedrag er hetzelfde uit? (zelfde data, zelfde foutmeldingen, zelfde knoppen)
+- Kun je in je eigen woorden uitleggen wat er is veranderd?
 
-If you cannot explain it, use `upgrade-explain` to ask Copilot to walk through it.
-
----
-
-## Why running and building matters
-
-Reading a code change is not enough.
-A change can *look* correct but break something subtle — a missing `await`, a wrong variable name, a missing `null` check.
-
-Always build and test after an upgrade. This is what professional developers do too.
+Als je het niet kunt uitleggen, gebruik dan `upgrade-explain` om Copilot het te laten doorlopen.
 
 ---
 
-## Ask "why" whenever you do not understand
+## Waarom bouwen en testen belangrijk is
 
-Every upgrade in this workflow is designed to be understandable.
-If Copilot does something you do not follow, ask:
+Een codewijziging lezen is niet genoeg.
+Een wijziging kan er *goed uitzien* maar iets subtiel kapot maken — een ontbrekende `await`, een verkeerde variabelenaam, een ontbrekende `null`-check.
 
-> "Can you explain why you changed this? Use simple words."
-
-Or use the `upgrade-explain` prompt before making any change at all.
-
-There are no bad questions. The goal is understanding, not just having clean code.
+Bouw en test altijd na een verbetering. Dit is ook wat professionele ontwikkelaars doen.
 
 ---
 
-## Example session
+## Vraag "waarom?" wanneer je iets niet begrijpt
 
-**Student opens `WorkOrders.razor` and attaches `upgrade.prompt.md`:**
+Elke verbetering in deze workflow is ontworpen om begrijpelijk te zijn.
+Als Copilot iets doet dat je niet volgt, vraag dan:
+
+> "Kun je uitleggen waarom je dit hebt gewijzigd? Gebruik eenvoudige woorden."
+
+Of gebruik de `upgrade-explain`-prompt vóór je überhaupt een wijziging maakt.
+
+Er zijn geen domme vragen. Het doel is begrip, niet alleen nette code.
+
+---
+
+## Voorbeeldsessie
+
+**Student opent `WorkOrders.razor` en koppelt `upgrade.prompt.md`:**
 
 > **Copilot:**
 >
-> What I noticed:
-> In `WorkOrders.razor`, lines 156–157 fetch the token and set the Authorization header.
-> The same two lines appear in `WorkOrderDetail.razor`, `Teams.razor`, and 3 other pages.
+> Wat ik zag:
+> In `WorkOrders.razor`, regels 156–157, wordt het token opgehaald en de Authorization-header ingesteld.
+> Dezelfde twee regels staan ook in `WorkOrderDetail.razor`, `Teams.razor` en 3 andere pagina's.
 >
-> Why this matters:
-> If the way tokens are attached ever changes (e.g., a different header name), you would need to update 6 files.
+> Waarom dit belangrijk is:
+> Als de manier waarop tokens worden gekoppeld ooit verandert (bijv. een andere headernaam), moet je 6 bestanden bijwerken.
 >
-> Upgrade step:
-> I will extract a private `SetAuthHeaderAsync()` method in `WorkOrders.razor` so the duplication is gone within this one page.
+> Verbeterstap:
+> Ik extraheer een private `StelTokenHeaderIn()`-methode in `WorkOrders.razor` zodat de herhaling binnen deze ene pagina verdwijnt.
 >
-> Files changed:
+> Gewijzigde bestanden:
 > - `CovAuto.Client/Pages/WorkOrders.razor`
 >
-> How to check:
-> Open `/werkorders` in the browser and check that the list still loads correctly.
+> Hoe controleer je dit:
+> Open `/werkorders` in de browser en controleer of de lijst nog correct laadt.
 >
-> Possible next upgrade:
-> Move `SetAuthHeaderAsync` to a shared static `TokenHelper` class so all pages can use it.
+> Mogelijke volgende stap:
+> Verplaats `StelTokenHeaderIn` naar een gedeelde statische `TokenHulp`-klasse zodat alle pagina's hem kunnen gebruiken.
 
-**Student builds, checks the page, commits, then attaches `upgrade-next.prompt.md`:**
+**Student bouwt, controleert de pagina, commit, en koppelt daarna `upgrade-next.prompt.md`:**
 
 > **Copilot:**
-> (continues to step 4 — extracts the static helper class)
+> (gaat verder naar stap 4 — extraheert de statische hulpklasse)
 
-And so on, one step at a time.
+En zo verder, één stap tegelijk.
+
