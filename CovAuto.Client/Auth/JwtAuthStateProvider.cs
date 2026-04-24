@@ -1,22 +1,23 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 
 namespace CovAuto.Client.Auth;
 
 public class JwtAuthStateProvider : AuthenticationStateProvider
 {
     private const string TokenKey = "auth_token";
-    private readonly SessionStorageService _sessionStorage;
+    private readonly IJSRuntime _js;
 
-    public JwtAuthStateProvider(SessionStorageService sessionStorage)
+    public JwtAuthStateProvider(IJSRuntime js)
     {
-        _sessionStorage = sessionStorage;
+        _js = js;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await _sessionStorage.GetItemAsync(TokenKey);
+        var token = await _js.InvokeAsync<string?>("sessionStorage.getItem", TokenKey);
 
         if (string.IsNullOrWhiteSpace(token))
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
@@ -28,7 +29,7 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
 
     public async Task MarkUserAsAuthenticated(string token)
     {
-        await _sessionStorage.SetItemAsync(TokenKey, token);
+        await _js.InvokeVoidAsync("sessionStorage.setItem", TokenKey, token);
         var claims = ParseClaimsFromJwt(token);
         var identity = new ClaimsIdentity(claims, "jwt");
         var user = new ClaimsPrincipal(identity);
@@ -37,13 +38,13 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
 
     public async Task MarkUserAsLoggedOut()
     {
-        await _sessionStorage.RemoveItemAsync(TokenKey);
+        await _js.InvokeVoidAsync("sessionStorage.removeItem", TokenKey);
         var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
     }
 
     public async Task<string?> GetTokenAsync()
-        => await _sessionStorage.GetItemAsync(TokenKey);
+        => await _js.InvokeAsync<string?>("sessionStorage.getItem", TokenKey);
 
     private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {

@@ -132,9 +132,8 @@ cov-auto/
 
 | Bestand | Doel |
 |---------|------|
-| `Auth/SessionStorageService.cs` | JWT opslaan in browser sessionStorage |
-| `Auth/JwtAuthStateProvider.cs` | Blazor vertellen wie er ingelogd is op basis van het JWT |
-| `Auth/AuthTokenHandler.cs` | JWT automatisch meesturen bij elke API-aanroep |
+| `Auth/JwtAuthStateProvider.cs` | Slaat het JWT op in browser `sessionStorage` en vertelt Blazor wie er ingelogd is |
+| `Auth/AuthTokenHandler.cs` | Voegt automatisch `Authorization: Bearer ...` toe aan elke API-aanroep |
 
 ---
 

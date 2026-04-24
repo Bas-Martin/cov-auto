@@ -11,43 +11,29 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5239/";
 if (!apiBaseUrl.EndsWith('/')) apiBaseUrl += '/';
 
-builder.Services.AddSingleton<SessionStorageService>();
 builder.Services.AddSingleton<JwtAuthStateProvider>();
 builder.Services.AddSingleton<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<JwtAuthStateProvider>());
 
 builder.Services.AddTransient<AuthTokenHandler>();
-builder.Services.AddHttpClient("CovAutoAPI", client =>
+
+// Login gebruikt geen token, dus geen AuthTokenHandler
+builder.Services.AddHttpClient<AuthService>(client =>
+    client.BaseAddress = new Uri(apiBaseUrl));
+
+// Overige API-aanroepen krijgen automatisch het Bearer token via AuthTokenHandler
+builder.Services.AddHttpClient<WorkOrderApiService>(client =>
     client.BaseAddress = new Uri(apiBaseUrl))
     .AddHttpMessageHandler<AuthTokenHandler>();
 
-builder.Services.AddHttpClient("CovAutoPublic", client =>
-    client.BaseAddress = new Uri(apiBaseUrl));
+builder.Services.AddHttpClient<TeamApiService>(client =>
+    client.BaseAddress = new Uri(apiBaseUrl))
+    .AddHttpMessageHandler<AuthTokenHandler>();
+
+builder.Services.AddHttpClient<ReportApiService>(client =>
+    client.BaseAddress = new Uri(apiBaseUrl))
+    .AddHttpMessageHandler<AuthTokenHandler>();
 
 builder.Services.AddAuthorizationCore();
-
-builder.Services.AddScoped<AuthService>(sp =>
-{
-    var factory = sp.GetRequiredService<IHttpClientFactory>();
-    var http = factory.CreateClient("CovAutoPublic");
-    var authProvider = sp.GetRequiredService<JwtAuthStateProvider>();
-    return new AuthService(http, authProvider);
-});
-
-builder.Services.AddScoped<WorkOrderApiService>(sp =>
-{
-    var factory = sp.GetRequiredService<IHttpClientFactory>();
-    return new WorkOrderApiService(factory.CreateClient("CovAutoAPI"));
-});
-builder.Services.AddScoped<TeamApiService>(sp =>
-{
-    var factory = sp.GetRequiredService<IHttpClientFactory>();
-    return new TeamApiService(factory.CreateClient("CovAutoAPI"));
-});
-builder.Services.AddScoped<ReportApiService>(sp =>
-{
-    var factory = sp.GetRequiredService<IHttpClientFactory>();
-    return new ReportApiService(factory.CreateClient("CovAutoAPI"));
-});
 
 await builder.Build().RunAsync();

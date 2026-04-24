@@ -42,7 +42,14 @@ Wachtwoord voor alle testaccounts: **Demo1234!**
    ```
 4. Het token bevat je naam, rol en team-ID. De API gebruikt dat om te controleren wat je mag zien.
 
-In de Blazor client slaat `AuthTokenHandler.cs` het token automatisch op en voegt het toe aan elke aanvraag.
+In de Blazor client regelen twee bestanden de authenticatie:
+
+| Bestand | Taak |
+|---------|------|
+| `Auth/JwtAuthStateProvider.cs` | Slaat het token op in `sessionStorage` en vertelt Blazor wie er ingelogd is |
+| `Auth/AuthTokenHandler.cs` | Leest het token uit `JwtAuthStateProvider` en plakt het automatisch als `Bearer`-header op elke API-aanroep |
+
+`AuthTokenHandler` is gekoppeld aan de HTTP-clients voor API-aanroepen via `Program.cs`. De login-aanroep gebruikt een aparte client zónder `AuthTokenHandler`, zodat een ongeldig/leeg token de login niet verstoort.
 
 ---
 
