@@ -15,24 +15,19 @@ builder.Services.AddSingleton<JwtAuthStateProvider>();
 builder.Services.AddSingleton<AuthenticationStateProvider>(sp =>
     sp.GetRequiredService<JwtAuthStateProvider>());
 
-builder.Services.AddTransient<AuthTokenHandler>();
-
-// Login gebruikt geen token, dus geen AuthTokenHandler
+// Login gebruikt geen token
 builder.Services.AddHttpClient<AuthService>(client =>
     client.BaseAddress = new Uri(apiBaseUrl));
 
-// Overige API-aanroepen krijgen automatisch het Bearer token via AuthTokenHandler
+// API-services: elke methode voegt zelf het Bearer token toe
 builder.Services.AddHttpClient<WorkOrderApiService>(client =>
-    client.BaseAddress = new Uri(apiBaseUrl))
-    .AddHttpMessageHandler<AuthTokenHandler>();
+    client.BaseAddress = new Uri(apiBaseUrl));
 
 builder.Services.AddHttpClient<TeamApiService>(client =>
-    client.BaseAddress = new Uri(apiBaseUrl))
-    .AddHttpMessageHandler<AuthTokenHandler>();
+    client.BaseAddress = new Uri(apiBaseUrl));
 
 builder.Services.AddHttpClient<ReportApiService>(client =>
-    client.BaseAddress = new Uri(apiBaseUrl))
-    .AddHttpMessageHandler<AuthTokenHandler>();
+    client.BaseAddress = new Uri(apiBaseUrl));
 
 builder.Services.AddAuthorizationCore();
 
