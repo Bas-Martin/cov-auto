@@ -23,7 +23,10 @@ Maak alleen de **volgende logische stap** op dezelfde ladder.
 ## Ladderoverzicht
 
 **Token-auth:**
-1. Herhaalde token-code → 2. Duidelijker met opmerkingen → 3. Private hulpmethode → 4. Statische hulpklasse → 5. TokenService → 6. DelegatingHandler → 7. Typed HttpClient → 8. 401-doorstuur
+1. Herhaalde token-code → 2. Duidelijker met opmerkingen → 3. Private hulpmethode → 4. Statische hulpklasse → 5. TokenService → *[doe eerst API-serviceklassen-ladder]* → 6. DelegatingHandler → 7. Typed HttpClient → 8. 401-doorstuur
+
+**API-serviceklassen:**
+1. Inline HTTP-aanroepen in pagina's → 2. Private methode op pagina → 3. WerkorderApiService → 4. Alle domeinservices (Teams, Rapport) → 5. AuthService → 6. DI-registratie in Program.cs
 
 **Routestrings:**
 1. Inline strings → 2. Lokale constanten → 3. ApiRoutes-klasse → 4. Gegroepeerd per domein
@@ -36,6 +39,9 @@ Maak alleen de **volgende logische stap** op dezelfde ladder.
 
 **Formuliervalidatie:**
 1. Geen validatie → 2. if-statements → 3. Valideer()-methode → 4. Data-annotaties → 5. EditForm + DataAnnotationsValidator
+
+**Authenticatiestatus:**
+1. Token direct in sessionStorage → 2. AuthOpslagSleutels-constanten → 3. SessionStorageService → 4. JwtAuthStateProvider → 5. Inloggen/uitloggen verbonden
 
 ## Antwoordformat
 

@@ -40,6 +40,10 @@ Extraheer een `static TokenHulp`-klasse met één methode `PasTokenToe(HttpClien
 Stap 5 — **TokenService (geregistreerd in DI)**
 Maak een `TokenService` die `JwtAuthStateProvider.GetTokenAsync()` omhult en de header instelt. Injecteer die in pagina's in plaats van `JwtAuthStateProvider` direct.
 
+> **Let op:** Stap 6 bouwt voort op de **API-serviceklassen-ladder**. Zorg dat serviceklassen
+> (`WerkorderApiService`, `TeamsApiService`, `RapportApiService`, `AuthService`) al zijn
+> geëxtraheerd en geregistreerd in `Program.cs` voordat je doorgaat naar stap 6.
+
 Stap 6 — **TokenAuthHandler : DelegatingHandler**
 Maak een `DelegatingHandler` die het token automatisch koppelt aan elk uitgaand verzoek. Pagina's hoeven de header dan helemaal niet meer in te stellen.
 

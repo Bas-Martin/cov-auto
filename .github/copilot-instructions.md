@@ -22,6 +22,22 @@ Het doel is leren, niet zo snel mogelijk productieklare code schrijven.
 
 ---
 
+## Doelcode
+
+Het eindresultaat van alle verbeterladders is de `main`-branch van deze repository (commit `2bb32f9`).
+Vergelijk bij elke stap met de doelbestanden op `main` om te controleren of je de goede kant op gaat.
+
+Sleutelbestanden op `main`:
+- `CovAuto.Client/Auth/AuthTokenHandler.cs`
+- `CovAuto.Client/Auth/SessionStorageService.cs`
+- `CovAuto.Client/Services/WorkOrderApiService.cs`
+- `CovAuto.Client/Services/TeamApiService.cs`
+- `CovAuto.Client/Services/ReportApiService.cs`
+- `CovAuto.Client/Services/AuthService.cs`
+- `CovAuto.Client/Program.cs`
+
+---
+
 ## Leerpad
 
 Elke verbetering volgt dit pad:
@@ -98,9 +114,20 @@ Mogelijke volgende stap:
 3. Extraheer een `private async Task StelTokenHeaderIn()` hulpmethode op de pagina.
 4. Extraheer een `static TokenHulp`-klasse.
 5. Extraheer een `TokenService` (geregistreerd in DI).
+   *(Doorloop nu eerst de API-serviceklassen-ladder (stap 1–6) voordat je doorgaat naar stap 6.)*
 6. Implementeer `TokenAuthHandler : DelegatingHandler`.
 7. Registreer een typed `HttpClient` met de handler in `Program.cs`.
 8. Voeg optioneel 401-uitlog/doorstuurgedrag toe in de handler.
+
+### API-serviceklassen-ladder
+*(Huidige staat: HTTP-aanroepen staan direct in de `@code`-blokken van de pagina's)*
+
+1. HTTP-aanroepen en JSON-parsing staan inline in de pagina-code (bijv. in `WorkOrders.razor`).
+2. Extraheer één private methode op de pagina zelf (bijv. `private async Task<List<WerkorderDto>?> HaalWerkordersOp()`).
+3. Maak een aparte `WerkorderApiService`-klasse en verplaats de methode daarheen. Injecteer de service via `@inject WerkorderApiService WerkorderService`.
+4. Doe hetzelfde voor andere domeinen: maak `TeamsApiService` en `RapportApiService`.
+5. Maak `AuthService` los van de login-pagina: verplaats de inlog-aanroep naar een eigen klasse.
+6. Registreer alle serviceklassen in `Program.cs` via `builder.Services.AddScoped<...>()`.
 
 ### API-routestrings-ladder
 *(Huidige staat: routestrings zijn inline geschreven in elke pagina)*
@@ -153,7 +180,7 @@ Mogelijke volgende stap:
 
 1. Inloggen slaat token direct op in `sessionStorage`.
 2. Voeg `AuthOpslagSleutels`-constanten toe voor opslagsleutelnamen.
-3. Voeg `TokenService` toe (omhult sessionStorage-toegang).
+3. Extraheer een `SessionStorageService`-klasse die de `IJSRuntime`-aanroepen voor `sessionStorage.getItem/setItem/removeItem` omhult. Registreer die in DI via `builder.Services.AddSingleton<SessionStorageService>()`.
 4. Voeg `CustomAuthenticationStateProvider` toe (verbindt token met Blazor-auth).
 5. Verbind inloggen/uitloggen met meldingen over authenticatiestatus.
 6. Voeg rolondersteuning toe (al aanwezig: `Planner`, `Monteur`).
