@@ -105,19 +105,6 @@ cov-auto/
 
 ---
 
-### Front-end: Pagina's
-
-| Bestand | Route | Doel |
-|---------|-------|------|
-| `Pages/Home.razor` | `/` | Dashboard na inloggen |
-| `Pages/Login.razor` | `/login` | Inlogformulier |
-| `Pages/WorkOrders.razor` | `/werkorders` | Lijst van werkorders met filters |
-| `Pages/WorkOrderDetail.razor` | `/werkorders/{id}` | Detail van één werkorder |
-| `Pages/WorkOrderCreate.razor` | `/werkorders/nieuw` | Nieuwe werkorder aanmaken |
-| `Pages/Teams.razor` | `/teams` | Lijst van teams (alleen planner) |
-| `Pages/TeamDetail.razor` | `/teams/{id}` | Detail van één team |
-| `Pages/Reports.razor` | `/rapporten` | Rapporten genereren (alleen planner) |
-
 ### Front-end: Pagina's (bevatten ook de HTTP-aanroepen)
 
 | Bestand | Route | Doel |
