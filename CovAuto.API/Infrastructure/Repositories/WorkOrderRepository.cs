@@ -1,4 +1,3 @@
-using CovAuto.API.Application.Interfaces;
 using CovAuto.API.Application.QueryParameters;
 using CovAuto.API.Common;
 using CovAuto.API.Domain.Entities;
@@ -11,7 +10,7 @@ namespace CovAuto.API.Infrastructure.Repositories;
 /// Repository voor werkorders. Handelt alle database-queries voor WorkOrder af,
 /// inclusief filtering, sorting en pagination.
 /// </summary>
-public class WorkOrderRepository : IWorkOrderRepository
+public class WorkOrderRepository
 {
     private readonly AppDbContext _context;
 

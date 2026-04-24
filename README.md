@@ -1,114 +1,91 @@
-# CovAuto API
+# CovAuto
 
-Een .NET 8 Web API voor het beheren van werkorders (werkorders) en servicetechnici (monteurs).
+Demo-applicatie voor het beheren van werkorders en servicetechnici (monteurs).
 
 ## Wat doet dit project?
 
-CovAuto API biedt een REST API voor een bedrijf met servicetechnici en werkorders. De API demonstreert:
+CovAuto is een voorbeeld-systeem voor een servicebedrijf. Er zijn twee rollen:
 
-- **JWT-authenticatie** en rolgebaseerde autorisatie
-- **Filtering, sorting en pagination** op werkorders
-- **Asynchrone verwerking**: sequentieel vs. parallel rapporten genereren (`Task.WhenAll`)
-- **Clean Architecture** structuur: Domain → Application → Infrastructure
+- **Planners** – zien alles, kunnen werkorders aanmaken en rapporten genereren
+- **Monteurs** – zien alleen werkorders van hun eigen team
 
-## Rollen
+De applicatie laat zien hoe je een .NET Web API bouwt met:
+- JWT-authenticatie en rolgebaseerde autorisatie
+- Filtering, sortering en paginering op lijsten
+- Async verwerking: sequentieel vs. parallel rapporten genereren
+- Een Blazor WebAssembly front-end
 
-| Rol | Beschrijving |
-|-----|-------------|
-| **Planner** | Ziet alle teams en werkorders, kan werkorders aanmaken, genereert rapporten |
-| **Monteur** | Ziet alleen werkorders van het eigen team |
+## Snel starten
 
-## Starten
-
+**Terminal 1 – API:**
 ```bash
 cd CovAuto.API
 dotnet run
 ```
+Swagger UI: http://localhost:5239
 
-De Swagger UI is beschikbaar op: `http://localhost:5000`
-
-## Testgebruikers
-
-Alle gebruikers hebben wachtwoord: **Demo1234!**
-
-| Gebruikersnaam     | Rol     | Team          |
-|--------------------|---------|---------------|
-| `planner.noord`    | Planner | Noord Service |
-| `planner.zuid`     | Planner | Zuid Service  |
-| `monteur.jan`      | Monteur | Noord Service |
-| `monteur.fatma`    | Monteur | Noord Service |
-| `monteur.sven`     | Monteur | Zuid Service  |
-| `monteur.ayse`     | Monteur | Zuid Service  |
-
-## Endpoints
-
-### Authenticatie
-| Methode | URL | Beschrijving |
-|---------|-----|-------------|
-| `POST` | `/auth/login` | Inloggen en JWT token ophalen |
-
-### Teams
-| Methode | URL | Rol | Beschrijving |
-|---------|-----|-----|-------------|
-| `GET` | `/teams` | Planner | Alle teams ophalen |
-| `GET` | `/teams/{id}` | Planner/Monteur* | Één team ophalen |
-
-*Monteur mag alleen zijn eigen team opvragen.
-
-### Werkorders
-| Methode | URL | Rol | Beschrijving |
-|---------|-----|-----|-------------|
-| `GET` | `/workorders` | Planner/Monteur | Werkorders met filtering/sorting/pagination |
-| `GET` | `/workorders/{id}` | Planner/Monteur | Één werkorder ophalen |
-| `POST` | `/workorders` | Planner | Nieuwe werkorder aanmaken |
-
-### Rapporten
-| Methode | URL | Rol | Beschrijving |
-|---------|-----|-----|-------------|
-| `POST` | `/reports/workorders/team/{id}` | Planner | Rapport voor één team |
-| `POST` | `/reports/workorders/bulk` | Planner | Bulk rapporten parallel |
-| `GET` | `/reports/performance-comparison` | Planner | Sequentieel vs. parallel vergelijking |
-
-## Filtering, Sorting & Pagination
-
-De `GET /workorders` endpoint ondersteunt de volgende query parameters:
-
-**Filtering:**
-- `title` – Zoek op titel (bevat)
-- `status` – Filter op status: `Nieuw`, `Gepland`, `InUitvoering`, `Voltooid`, `Geannuleerd`
-- `priority` – Filter op prioriteit: `Laag`, `Normaal`, `Hoog`, `Kritiek`
-- `customerName` – Zoek op klantnaam
-- `minEstimatedHours` / `maxEstimatedHours` – Filter op geschatte uren
-
-**Sortering:**
-- `sortBy` – `title`, `estimatedHours`, `createdAt`, `scheduledFor` (standaard: `createdAt`)
-- `sortDirection` – `asc` of `desc` (standaard: `desc`)
-
-**Pagination:**
-- `page` – Paginanummer (standaard: `1`)
-- `pageSize` – Items per pagina (standaard: `10`, max: `100`)
-
-**Voorbeeld:**
+**Terminal 2 – Client:**
+```bash
+cd CovAuto.Client
+dotnet run
 ```
-GET /workorders?status=Nieuw&priority=Hoog&sortBy=estimatedHours&sortDirection=asc&page=1&pageSize=5
-```
+Applicatie: http://localhost:5264
 
-## Project structuur
+**Inloggen** (wachtwoord voor alle accounts: `Demo1234!`):
+
+| Gebruikersnaam   | Rol     |
+|------------------|---------|
+| `planner.noord`  | Planner |
+| `planner.zuid`   | Planner |
+| `monteur.jan`    | Monteur |
+| `monteur.fatma`  | Monteur |
+| `monteur.sven`   | Monteur |
+| `monteur.ayse`   | Monteur |
+
+## Projectstructuur
 
 ```
 CovAuto.API/
-├── Controllers/          # HTTP endpoints
+├── Controllers/        # HTTP endpoints
 ├── Application/
-│   ├── DTOs/             # Data Transfer Objects
-│   ├── Interfaces/       # Service interfaces
-│   ├── Services/         # Businesslogica
-│   └── QueryParameters/  # Filter/sort/pagination parameters
+│   ├── DTOs/           # Data-objecten in/uit de API
+│   ├── Services/       # Businesslogica
+│   └── QueryParameters/# Filter/sort/pagina parameters
 ├── Domain/
-│   ├── Entities/         # Database entiteiten
-│   └── Enums/            # Enumeraties
+│   ├── Entities/       # Database-entiteiten
+│   └── Enums/          # Vaste waarden (status, prioriteit, rol)
 ├── Infrastructure/
-│   └── Data/             # AppDbContext + seed data
-└── Common/               # Gedeelde klassen (ApiResponse, PagedResult)
+│   ├── Data/           # AppDbContext + seed data
+│   └── Repositories/   # Database-queries
+└── Common/             # ApiResponse, PagedResult
+
+CovAuto.Client/
+├── Pages/              # Blazor pagina's
+├── Services/           # HTTP-aanroepen naar de API
+├── Auth/               # JWT opslaan en meesturen
+└── Models/             # Data-objecten
 ```
 
-Monteurs hebben werkorders nodig.
+## Documentatie
+
+| Document | Beschrijving |
+|----------|-------------|
+| [docs/BEGINNER_GUIDE.md](docs/BEGINNER_GUIDE.md) | Hoe authenticatie werkt, hoe je een veld of endpoint toevoegt |
+| [docs/PROJECT_MAP.md](docs/PROJECT_MAP.md) | Overzicht van alle bestanden en hun doel |
+| [docs/RUN_LOCALLY.md](docs/RUN_LOCALLY.md) | Stap-voor-stap opstartinstructies |
+| [docs/API_OVERVIEW.md](docs/API_OVERVIEW.md) | Alle endpoints met voorbeelden |
+
+## Endpoints (kort overzicht)
+
+| Methode | URL | Rol | Beschrijving |
+|---------|-----|-----|-------------|
+| `POST` | `/auth/login` | Iedereen | Inloggen, JWT ophalen |
+| `GET` | `/teams` | Planner | Alle teams |
+| `GET` | `/teams/{id}` | Planner/Monteur | Één team |
+| `GET` | `/workorders` | Planner/Monteur | Werkorders (met filters) |
+| `GET` | `/workorders/{id}` | Planner/Monteur | Één werkorder |
+| `POST` | `/workorders` | Planner | Nieuwe werkorder aanmaken |
+| `POST` | `/reports/workorders/team/{id}` | Planner | Rapport voor één team |
+| `POST` | `/reports/workorders/bulk` | Planner | Bulk rapporten parallel |
+| `GET` | `/reports/performance-comparison` | Planner | Sequentieel vs. parallel |
+

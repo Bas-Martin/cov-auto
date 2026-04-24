@@ -1,5 +1,5 @@
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
+using CovAuto.API.Application.Services;
 using CovAuto.API.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace CovAuto.API.Controllers;
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly AuthService _authService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(AuthService authService)
     {
         _authService = authService;
     }

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
+using CovAuto.API.Infrastructure.Repositories;
 
 namespace CovAuto.API.Application.Services;
 
@@ -9,15 +9,15 @@ namespace CovAuto.API.Application.Services;
 /// Service voor het genereren van rapporten per team en periode.
 /// Demonstreert het verschil tussen sequentiële en parallelle verwerking.
 /// </summary>
-public class ReportService : IReportService
+public class ReportService
 {
-    private readonly IServiceTeamRepository _teamRepository;
-    private readonly IWorkOrderRepository _workOrderRepository;
+    private readonly ServiceTeamRepository _teamRepository;
+    private readonly WorkOrderRepository _workOrderRepository;
     private readonly ILogger<ReportService> _logger;
 
     public ReportService(
-        IServiceTeamRepository teamRepository,
-        IWorkOrderRepository workOrderRepository,
+        ServiceTeamRepository teamRepository,
+        WorkOrderRepository workOrderRepository,
         ILogger<ReportService> logger)
     {
         _teamRepository = teamRepository;

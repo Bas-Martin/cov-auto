@@ -1,4 +1,3 @@
-using CovAuto.API.Application.Interfaces;
 using CovAuto.API.Domain.Entities;
 using CovAuto.API.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +7,7 @@ namespace CovAuto.API.Infrastructure.Repositories;
 /// <summary>
 /// Repository voor serviceteams. Handelt alle database-queries voor ServiceTeam af.
 /// </summary>
-public class ServiceTeamRepository : IServiceTeamRepository
+public class ServiceTeamRepository
 {
     private readonly AppDbContext _context;
 

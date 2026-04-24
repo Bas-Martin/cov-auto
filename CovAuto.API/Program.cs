@@ -1,5 +1,4 @@
 using System.Text;
-using CovAuto.API.Application.Interfaces;
 using CovAuto.API.Application.Services;
 using CovAuto.API.Infrastructure.Data;
 using CovAuto.API.Infrastructure.Repositories;
@@ -82,15 +81,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // --- Dependency Injection: Repositories registreren ---
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IServiceTeamRepository, ServiceTeamRepository>();
-builder.Services.AddScoped<IWorkOrderRepository, WorkOrderRepository>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<ServiceTeamRepository>();
+builder.Services.AddScoped<WorkOrderRepository>();
 
 // --- Dependency Injection: Services registreren ---
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IServiceTeamService, ServiceTeamService>();
-builder.Services.AddScoped<IWorkOrderService, WorkOrderService>();
-builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ServiceTeamService>();
+builder.Services.AddScoped<WorkOrderService>();
+builder.Services.AddScoped<ReportService>();
 
 // --- Logging ---
 builder.Logging.ClearProviders();

@@ -1,5 +1,5 @@
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
+using CovAuto.API.Application.Services;
 using CovAuto.API.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +11,9 @@ namespace CovAuto.API.Controllers;
 [Authorize(Roles = "Planner")]
 public class ReportsController : ControllerBase
 {
-    private readonly IReportService _reportService;
+    private readonly ReportService _reportService;
 
-    public ReportsController(IReportService reportService)
+    public ReportsController(ReportService reportService)
     {
         _reportService = reportService;
     }

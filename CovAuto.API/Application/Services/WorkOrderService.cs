@@ -1,7 +1,7 @@
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
 using CovAuto.API.Application.QueryParameters;
 using CovAuto.API.Common;
+using CovAuto.API.Infrastructure.Repositories;
 
 namespace CovAuto.API.Application.Services;
 
@@ -9,11 +9,11 @@ namespace CovAuto.API.Application.Services;
 /// Service voor werkorderbeheer. Gebruikt de repository voor data-toegang
 /// en voert hier de mapping van entity naar DTO uit.
 /// </summary>
-public class WorkOrderService : IWorkOrderService
+public class WorkOrderService
 {
-    private readonly IWorkOrderRepository _workOrderRepository;
+    private readonly WorkOrderRepository _workOrderRepository;
 
-    public WorkOrderService(IWorkOrderRepository workOrderRepository)
+    public WorkOrderService(WorkOrderRepository workOrderRepository)
     {
         _workOrderRepository = workOrderRepository;
     }

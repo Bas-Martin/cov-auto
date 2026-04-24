@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
+using CovAuto.API.Infrastructure.Repositories;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CovAuto.API.Application.Services;
@@ -10,12 +10,12 @@ namespace CovAuto.API.Application.Services;
 /// <summary>
 /// Service voor authenticatie en JWT token generatie.
 /// </summary>
-public class AuthService : IAuthService
+public class AuthService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly UserRepository _userRepository;
     private readonly IConfiguration _configuration;
 
-    public AuthService(IUserRepository userRepository, IConfiguration configuration)
+    public AuthService(UserRepository userRepository, IConfiguration configuration)
     {
         _userRepository = userRepository;
         _configuration = configuration;

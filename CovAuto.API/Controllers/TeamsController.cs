@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
+using CovAuto.API.Application.Services;
 using CovAuto.API.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +12,9 @@ namespace CovAuto.API.Controllers;
 [Authorize]
 public class TeamsController : ControllerBase
 {
-    private readonly IServiceTeamService _teamService;
+    private readonly ServiceTeamService _teamService;
 
-    public TeamsController(IServiceTeamService teamService)
+    public TeamsController(ServiceTeamService teamService)
     {
         _teamService = teamService;
     }

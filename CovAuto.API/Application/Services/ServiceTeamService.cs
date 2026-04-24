@@ -1,16 +1,16 @@
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
+using CovAuto.API.Infrastructure.Repositories;
 
 namespace CovAuto.API.Application.Services;
 
 /// <summary>
 /// Service voor het ophalen van serviceteams.
 /// </summary>
-public class ServiceTeamService : IServiceTeamService
+public class ServiceTeamService
 {
-    private readonly IServiceTeamRepository _teamRepository;
+    private readonly ServiceTeamRepository _teamRepository;
 
-    public ServiceTeamService(IServiceTeamRepository teamRepository)
+    public ServiceTeamService(ServiceTeamRepository teamRepository)
     {
         _teamRepository = teamRepository;
     }

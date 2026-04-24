@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using CovAuto.API.Application.DTOs;
-using CovAuto.API.Application.Interfaces;
 using CovAuto.API.Application.QueryParameters;
+using CovAuto.API.Application.Services;
 using CovAuto.API.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +13,9 @@ namespace CovAuto.API.Controllers;
 [Authorize]
 public class WorkOrdersController : ControllerBase
 {
-    private readonly IWorkOrderService _workOrderService;
+    private readonly WorkOrderService _workOrderService;
 
-    public WorkOrdersController(IWorkOrderService workOrderService)
+    public WorkOrdersController(WorkOrderService workOrderService)
     {
         _workOrderService = workOrderService;
     }
