@@ -10,7 +10,7 @@ namespace CovAuto.API.Infrastructure.Data;
 public class AppDbContext : DbContext
 {
     // Fixed BCrypt hash for "Demo1234!" - hardcoded to ensure migration stability
-    private const string DemoPasswordHash = "$2a$11$CtVfTc19Zo6wqxhu6FaEp.XC83OAZastaj4jl.OVrpVwcYVykck7e";
+    private const string DemoPasswordHash = "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi";
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

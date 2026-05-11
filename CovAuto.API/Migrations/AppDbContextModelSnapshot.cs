@@ -92,7 +92,7 @@ namespace CovAuto.API.Migrations
                         {
                             Id = 1,
                             FullName = "Linda van Noord",
-                            PasswordHash = "$2a$11$CtVfTc19Zo6wqxhu6FaEp.XC83OAZastaj4jl.OVrpVwcYVykck7e",
+                            PasswordHash = "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi",
                             Role = "Planner",
                             Username = "planner.noord"
                         },
@@ -100,7 +100,7 @@ namespace CovAuto.API.Migrations
                         {
                             Id = 2,
                             FullName = "Ahmed El Farsi",
-                            PasswordHash = "$2a$11$CtVfTc19Zo6wqxhu6FaEp.XC83OAZastaj4jl.OVrpVwcYVykck7e",
+                            PasswordHash = "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi",
                             Role = "Planner",
                             Username = "planner.zuid"
                         },
@@ -108,7 +108,7 @@ namespace CovAuto.API.Migrations
                         {
                             Id = 3,
                             FullName = "Jan de Vries",
-                            PasswordHash = "$2a$11$CtVfTc19Zo6wqxhu6FaEp.XC83OAZastaj4jl.OVrpVwcYVykck7e",
+                            PasswordHash = "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi",
                             Role = "Monteur",
                             ServiceTeamId = 1,
                             Username = "monteur.jan"
@@ -117,7 +117,7 @@ namespace CovAuto.API.Migrations
                         {
                             Id = 4,
                             FullName = "Fatma Yilmaz",
-                            PasswordHash = "$2a$11$CtVfTc19Zo6wqxhu6FaEp.XC83OAZastaj4jl.OVrpVwcYVykck7e",
+                            PasswordHash = "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi",
                             Role = "Monteur",
                             ServiceTeamId = 1,
                             Username = "monteur.fatma"
@@ -126,7 +126,7 @@ namespace CovAuto.API.Migrations
                         {
                             Id = 5,
                             FullName = "Sven Bakker",
-                            PasswordHash = "$2a$11$CtVfTc19Zo6wqxhu6FaEp.XC83OAZastaj4jl.OVrpVwcYVykck7e",
+                            PasswordHash = "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi",
                             Role = "Monteur",
                             ServiceTeamId = 2,
                             Username = "monteur.sven"
@@ -135,7 +135,7 @@ namespace CovAuto.API.Migrations
                         {
                             Id = 6,
                             FullName = "Ayse Demir",
-                            PasswordHash = "$2a$11$CtVfTc19Zo6wqxhu6FaEp.XC83OAZastaj4jl.OVrpVwcYVykck7e",
+                            PasswordHash = "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi",
                             Role = "Monteur",
                             ServiceTeamId = 2,
                             Username = "monteur.ayse"

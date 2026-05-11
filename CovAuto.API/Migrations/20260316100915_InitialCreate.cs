@@ -92,12 +92,12 @@ namespace CovAuto.API.Migrations
                 columns: new[] { "Id", "FullName", "PasswordHash", "Role", "ServiceTeamId", "Username" },
                 values: new object[,]
                 {
-                    { 1, "Lisa de Planner", "$2a$11$JN/dgP5hDjhJSTb8xbk/Bu9SxScg1CgMsWqgwgmLWDMvx7npNugi.", "Planner", null, "lisa.planner" },
-                    { 2, "Ahmed El Farsi", "$2a$11$JN/dgP5hDjhJSTb8xbk/Bu9SxScg1CgMsWqgwgmLWDMvx7npNugi.", "Planner", null, "planner.zuid" },
-                    { 3, "Jan de Vries", "$2a$11$YiJMc5svfc2UMCDA6YPn4.mp526VfUsjkodCjTl8IIrT.K6BJ9pEG", "Monteur", 1, "jan.monteur" },
-                    { 4, "Fatma Yilmaz", "$2a$11$YiJMc5svfc2UMCDA6YPn4.mp526VfUsjkodCjTl8IIrT.K6BJ9pEG", "Monteur", 1, "monteur.fatma" },
-                    { 5, "Sven Bakker", "$2a$11$YiJMc5svfc2UMCDA6YPn4.mp526VfUsjkodCjTl8IIrT.K6BJ9pEG", "Monteur", 2, "monteur.sven" },
-                    { 6, "Ayse Demir", "$2a$11$YiJMc5svfc2UMCDA6YPn4.mp526VfUsjkodCjTl8IIrT.K6BJ9pEG", "Monteur", 2, "monteur.ayse" }
+                    { 1, "Linda van Noord", "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi", "Planner", null, "planner.noord" },
+                    { 2, "Ahmed El Farsi", "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi", "Planner", null, "planner.zuid" },
+                    { 3, "Jan de Vries", "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi", "Monteur", 1, "monteur.jan" },
+                    { 4, "Fatma Yilmaz", "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi", "Monteur", 1, "monteur.fatma" },
+                    { 5, "Sven Bakker", "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi", "Monteur", 2, "monteur.sven" },
+                    { 6, "Ayse Demir", "$2a$11$muX///kAN4M0YBsyfOmWOOAJZsWpvY8GB0Fz4.Lo6haSdoxU8A7Mi", "Monteur", 2, "monteur.ayse" }
                 });
 
             migrationBuilder.InsertData(
