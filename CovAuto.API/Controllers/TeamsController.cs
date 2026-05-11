@@ -46,12 +46,16 @@ public class TeamsController : ControllerBase
         {
             var teamIdClaim = User.FindFirstValue("teamId");
             if (!int.TryParse(teamIdClaim, out var userTeamId) || userTeamId != teamId)
+            {
                 return StatusCode(403, ApiResponse<string>.Fail("U heeft geen toegang tot dit team."));
+            }
         }
 
         var team = await _teamService.GetTeamByIdAsync(teamId);
         if (team == null)
+        {
             return NotFound(ApiResponse<string>.Fail($"Team {teamId} niet gevonden."));
+        }
 
         return Ok(ApiResponse<ServiceTeamDto>.Ok(team));
     }

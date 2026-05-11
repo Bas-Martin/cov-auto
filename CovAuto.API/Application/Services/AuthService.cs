@@ -27,11 +27,15 @@ public class AuthService
         var user = await _userRepository.GetByUsernameAsync(request.Username);
 
         if (user == null)
+        {
             return null;
+        }
 
         // Controleer het wachtwoord
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        {
             return null;
+        }
 
         // Genereer een JWT token
         var token = GenerateJwtToken(user);

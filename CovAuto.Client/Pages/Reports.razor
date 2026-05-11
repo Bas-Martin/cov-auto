@@ -161,13 +161,23 @@
 
     private void ToggleTeam(int id, bool add)
     {
-        if (add) _bulkTeamIds.Add(id);
-        else _bulkTeamIds.Remove(id);
+        if (add)
+        {
+            _bulkTeamIds.Add(id);
+        }
+        else
+        {
+            _bulkTeamIds.Remove(id);
+        }
     }
 
     private async Task GenerateTeamReport()
     {
-        if (_teamReportTeamId == 0) { _error = "Kies een team."; return; }
+        if (_teamReportTeamId == 0)
+        {
+            _error = "Kies een team.";
+            return;
+        }
         _loadingReport = true; _error = null;
         try
         {

@@ -16,12 +16,35 @@ public class WorkOrderQueryParameters
     public string ToQueryString()
     {
         var parts = new List<string>();
-        if (!string.IsNullOrEmpty(Title)) parts.Add($"title={Uri.EscapeDataString(Title)}");
-        if (!string.IsNullOrEmpty(Status)) parts.Add($"status={Uri.EscapeDataString(Status)}");
-        if (!string.IsNullOrEmpty(Priority)) parts.Add($"priority={Uri.EscapeDataString(Priority)}");
-        if (!string.IsNullOrEmpty(CustomerName)) parts.Add($"customerName={Uri.EscapeDataString(CustomerName)}");
-        if (MinEstimatedHours.HasValue) parts.Add($"minEstimatedHours={MinEstimatedHours}");
-        if (MaxEstimatedHours.HasValue) parts.Add($"maxEstimatedHours={MaxEstimatedHours}");
+        if (!string.IsNullOrEmpty(Title))
+        {
+            parts.Add($"title={Uri.EscapeDataString(Title)}");
+        }
+
+        if (!string.IsNullOrEmpty(Status))
+        {
+            parts.Add($"status={Uri.EscapeDataString(Status)}");
+        }
+
+        if (!string.IsNullOrEmpty(Priority))
+        {
+            parts.Add($"priority={Uri.EscapeDataString(Priority)}");
+        }
+
+        if (!string.IsNullOrEmpty(CustomerName))
+        {
+            parts.Add($"customerName={Uri.EscapeDataString(CustomerName)}");
+        }
+
+        if (MinEstimatedHours.HasValue)
+        {
+            parts.Add($"minEstimatedHours={MinEstimatedHours}");
+        }
+
+        if (MaxEstimatedHours.HasValue)
+        {
+            parts.Add($"maxEstimatedHours={MaxEstimatedHours}");
+        }
         parts.Add($"sortBy={SortBy}");
         parts.Add($"sortDirection={SortDirection}");
         parts.Add($"page={Page}");

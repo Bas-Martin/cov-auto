@@ -34,7 +34,9 @@ public class ReportService
 
         var team = await _teamRepository.GetByIdAsync(teamId);
         if (team == null)
+        {
             throw new KeyNotFoundException($"Team met id {teamId} niet gevonden.");
+        }
 
         var workOrders = await _workOrderRepository.GetByTeamAndPeriodAsync(teamId, from, to);
 

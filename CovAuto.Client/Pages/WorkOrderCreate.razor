@@ -142,7 +142,9 @@
 
         var result = await response.Content.ReadFromJsonAsync<ApiResponse<WorkOrderDto>>();
         if (result?.Data != null)
+        {
             Navigation.NavigateTo($"werkorders/{result.Data.Id}");
+        }
         else
         {
             _error = "Aanmaken mislukt.";

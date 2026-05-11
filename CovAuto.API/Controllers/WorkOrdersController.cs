@@ -46,7 +46,9 @@ public class WorkOrdersController : ControllerBase
     {
         var workOrder = await _workOrderService.GetWorkOrderByIdAsync(id);
         if (workOrder == null)
+        {
             return NotFound(ApiResponse<string>.Fail($"Werkorder {id} niet gevonden."));
+        }
 
         // Monteur mag alleen werkorders van eigen team zien
         var role = User.FindFirstValue(ClaimTypes.Role);
@@ -54,7 +56,9 @@ public class WorkOrdersController : ControllerBase
         {
             var teamIdClaim = User.FindFirstValue("teamId");
             if (!int.TryParse(teamIdClaim, out var userTeamId) || workOrder.ServiceTeamId != userTeamId)
+            {
                 return StatusCode(403, ApiResponse<string>.Fail("U heeft geen toegang tot deze werkorder."));
+            }
         }
 
         return Ok(ApiResponse<WorkOrderDto>.Ok(workOrder));
@@ -70,7 +74,9 @@ public class WorkOrdersController : ControllerBase
     public async Task<IActionResult> CreateWorkOrder([FromBody] CreateWorkOrderRequest request)
     {
         if (!ModelState.IsValid)
+        {
             return BadRequest(ModelState);
+        }
 
         var workOrder = await _workOrderService.CreateWorkOrderAsync(request);
         return CreatedAtAction(nameof(GetWorkOrder), new { id = workOrder.Id },
@@ -82,7 +88,9 @@ public class WorkOrdersController : ControllerBase
     {
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role != "Monteur")
+        {
             return null;
+        }
 
         var teamIdClaim = User.FindFirstValue("teamId");
         return int.TryParse(teamIdClaim, out var teamId) ? teamId : null;

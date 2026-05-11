@@ -30,26 +30,40 @@ public class WorkOrderRepository
 
         // --- Filtering op team (voor monteurs) ---
         if (teamIdFilter.HasValue)
+        {
             query = query.Where(w => w.ServiceTeamId == teamIdFilter.Value);
+        }
 
         // --- Filtering op velden ---
         if (!string.IsNullOrWhiteSpace(queryParams.Title))
+        {
             query = query.Where(w => w.Title.Contains(queryParams.Title));
+        }
 
         if (queryParams.MinEstimatedHours.HasValue)
+        {
             query = query.Where(w => w.EstimatedHours >= queryParams.MinEstimatedHours.Value);
+        }
 
         if (queryParams.MaxEstimatedHours.HasValue)
+        {
             query = query.Where(w => w.EstimatedHours <= queryParams.MaxEstimatedHours.Value);
+        }
 
         if (queryParams.Status.HasValue)
+        {
             query = query.Where(w => w.Status == queryParams.Status.Value);
+        }
 
         if (queryParams.Priority.HasValue)
+        {
             query = query.Where(w => w.Priority == queryParams.Priority.Value);
+        }
 
         if (!string.IsNullOrWhiteSpace(queryParams.CustomerName))
+        {
             query = query.Where(w => w.CustomerName.Contains(queryParams.CustomerName));
+        }
 
         // --- Sorting ---
         query = (queryParams.SortBy.ToLower(), queryParams.SortDirection.ToLower()) switch

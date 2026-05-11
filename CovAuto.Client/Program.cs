@@ -8,7 +8,10 @@ builder.RootComponents.Add<CovAuto.Client.App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5239/";
-if (!apiBaseUrl.EndsWith('/')) apiBaseUrl += '/';
+if (!apiBaseUrl.EndsWith('/'))
+{
+    apiBaseUrl += '/';
+}
 
 builder.Services.AddSingleton<JwtAuthStateProvider>();
 builder.Services.AddSingleton<AuthenticationStateProvider>(sp =>

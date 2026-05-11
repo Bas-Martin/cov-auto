@@ -73,9 +73,13 @@ else if (_team != null)
 
             var result = await Http.GetFromJsonAsync<ApiResponse<ServiceTeamDto>>($"teams/{TeamId}");
             if (result?.Success == true)
+            {
                 _team = result.Data;
+            }
             else
+            {
                 _error = result?.Message ?? "Team niet gevonden.";
+            }
         }
         catch (Exception ex)
         {

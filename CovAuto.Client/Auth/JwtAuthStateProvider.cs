@@ -20,7 +20,9 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
         var token = await _js.InvokeAsync<string?>("sessionStorage.getItem", TokenKey);
 
         if (string.IsNullOrWhiteSpace(token))
+        {
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
 
         var claims = ParseClaimsFromJwt(token);
         var identity = new ClaimsIdentity(claims, "jwt");
@@ -60,7 +62,10 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
         catch { return claims; }
 
         var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(jsonBytes);
-        if (keyValuePairs == null) return claims;
+        if (keyValuePairs == null)
+        {
+            return claims;
+        }
 
         foreach (var kvp in keyValuePairs)
         {

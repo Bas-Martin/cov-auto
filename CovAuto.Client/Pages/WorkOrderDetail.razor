@@ -83,9 +83,13 @@ else if (_wo != null)
 
             var result = await Http.GetFromJsonAsync<ApiResponse<WorkOrderDto>>($"workorders/{Id}");
             if (result?.Success == true)
+            {
                 _wo = result.Data;
+            }
             else
+            {
                 _error = result?.Message ?? "Werkorder niet gevonden.";
+            }
         }
         catch (HttpRequestException ex) when ((int?)ex.StatusCode == 403)
         {
